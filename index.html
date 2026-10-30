@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Viver Assessoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;background:#f2f5f9;color:#16324f}
+  .page{display:flex;min-height:100vh}
+
+  /* ===== Painel esquerdo (hero) ===== */
+  .hero{position:relative;flex:0 0 52%;min-height:100vh;overflow:hidden;display:flex;flex-direction:column;
+        background:radial-gradient(900px 620px at 78% 28%, rgba(38,116,190,.55), transparent 62%),
+                   linear-gradient(160deg,#0a2743 0%,#0d3157 42%,#10406f 100%);}
+  .hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+        background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 90px),
+                   repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 90px);}
+  .float-icon{position:absolute;top:35%;left:52%;font-size:22px;color:#9cc9ec;opacity:.28;pointer-events:none}
+  .brand{position:relative;z-index:2;display:flex;align-items:center;gap:12px;padding:44px 0 0 52px}
+  .brand-mark{width:42px;height:42px}
+  .brand-text{display:flex;flex-direction:column;line-height:1.05}
+  .brand-name{color:#fff;font-weight:800;font-size:26px;letter-spacing:1px}
+  .brand-sub{color:#bcd7ec;font-weight:500;font-size:10.5px;letter-spacing:5.5px}
+  .hero-v{position:absolute;z-index:1;top:6%;right:5%;width:330px;filter:drop-shadow(0 18px 40px rgba(0,20,40,.45))}
+  .hero-content{position:relative;z-index:2;margin-top:auto;padding:0 56px 84px}
+  .badge{display:inline-block;color:#8fd4e8;font-size:11px;font-weight:600;letter-spacing:3.2px;margin-bottom:18px}
+  .hero-content h1{color:#fff;font-size:44px;font-weight:800;line-height:1.16;letter-spacing:-.5px}
+  .hero-content h1 .gold{color:#ecb64d}
+  .hero-content p{margin-top:22px;max-width:440px;color:rgba(223,236,248,.88);font-size:15px;font-weight:400;line-height:1.65}
+
+  /* ===== Painel direito (login) ===== */
+  .login{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 28px}
+  .login-inner{width:100%;max-width:442px}
+  .login h2{font-size:29px;font-weight:700;color:#14344f}
+  .login .sub{margin-top:8px;color:#6b7c8f;font-size:14px}
+  .tabs{margin-top:26px;display:flex;background:#e9eef4;border-radius:10px;padding:4px}
+  .tab{flex:1;border:0;background:transparent;color:#8aa0b5;font-family:inherit;font-size:14px;font-weight:500;
+       padding:11px 0;border-radius:8px;cursor:pointer;transition:.2s}
+  .tab.active{background:#fff;color:#1b3a5c;font-weight:600;box-shadow:0 2px 8px rgba(20,52,79,.10)}
+  form{margin-top:22px}
+  label{display:block;font-size:13px;font-weight:600;color:#2c4a63;margin-bottom:7px}
+  .field{position:relative;margin-bottom:18px}
+  input[type=email],input[type=password],input[type=text]{width:100%;height:46px;border:1px solid #dfe6ee;border-radius:8px;
+       background:#fff;padding:0 14px;font-family:inherit;font-size:14px;color:#16324f;outline:none;transition:border .2s}
+  input:focus{border-color:#4aa3f0}
+  input::placeholder{color:#a9b6c4}
+  .toggle-pass{position:absolute;right:14px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;
+       color:#2f80d6;font-family:inherit;font-size:13px;font-weight:500}
+  .row{display:flex;align-items:center;justify-content:space-between;margin:4px 0 20px}
+  .check{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#33475c;margin:0;cursor:pointer}
+  .check input{width:15px;height:15px;accent-color:#4aa3f0;cursor:pointer}
+  .row a{color:#2f80d6;font-size:13px;font-weight:500;text-decoration:none}
+  .row a:hover{text-decoration:underline}
+  .btn{width:100%;height:47px;border:0;border-radius:8px;background:#4aa3f0;color:#fff;font-family:inherit;
+       font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+  .btn:hover{background:#3d94e2}
+  .divider{display:flex;align-items:center;gap:14px;margin:26px 0 16px}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:#d9e2ea}
+  .divider span{color:#8aa0b5;font-size:11px;font-weight:600;letter-spacing:2.2px;white-space:nowrap}
+  .demo-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .demo-card{border:1px dashed #c3d2e0;border-radius:10px;background:rgba(255,255,255,.6);padding:14px 12px;
+       text-align:left;cursor:pointer;font-family:inherit;transition:border-color .2s,background .2s}
+  .demo-card:hover{border-color:#4aa3f0;background:#fff}
+  .demo-card strong{display:block;font-size:14px;font-weight:600;color:#14344f}
+  .demo-card span{display:block;margin-top:3px;font-size:12px;color:#7d93a8}
+  .foot{margin-top:26px;text-align:center;color:#93a5b7;font-size:12px;line-height:1.7}
+
+  /* Toast */
+  #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#0f2b46;color:#fff;
+       padding:12px 22px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:99;
+       box-shadow:0 10px 30px rgba(10,35,60,.35)}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Responsivo */
+  @media (max-width:920px){
+    .page{flex-direction:column}
+    .hero{flex:none;min-height:0}
+    .hero-v{width:200px;top:4%;right:4%}
+    .hero-content{padding:150px 32px 48px}
+    .hero-content h1{font-size:34px}
+    .brand{padding:28px 0 0 28px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Painel esquerdo -->
+  <aside class="hero">
+    <header class="brand">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+        <defs>
+          <linearGradient id="mk" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#bfe0ff"/><stop offset="1" stop-color="#2a7cd0"/>
+          </linearGradient>
+        </defs>
+        <path d="M9 9 L21 9 L29 33 L24 39 Z" fill="url(#mk)"/>
+        <path d="M30 11 L42 15 L34 39 L27 33 Z" fill="url(#mk)" opacity=".92"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-name">VIVER</span>
+        <span class="brand-sub">ASSESSORIA</span>
+      </div>
+    </header>
+
+    <span class="float-icon">$</span>
+
+    <svg class="hero-v" viewBox="0 0 260 240" aria-hidden="true">
+      <defs>
+        <linearGradient id="vg1" x1="0" y1="0" x2=".45" y2="1">
+          <stop offset="0" stop-color="#a8d4ff"/><stop offset=".38" stop-color="#5ea7ea"/><stop offset="1" stop-color="#14497f"/>
+        </linearGradient>
+        <linearGradient id="vg2" x1="0" y1="0" x2=".35" y2="1">
+          <stop offset="0" stop-color="#dcf0ff"/><stop offset=".42" stop-color="#8cc4f2"/><stop offset="1" stop-color="#2a6ca8"/>
+        </linearGradient>
+        <radialGradient id="glow" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#3f8fd8" stop-opacity=".5"/><stop offset="1" stop-color="#3f8fd8" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx="128" cy="118" rx="120" ry="108" fill="url(#glow)"/>
+      <rect x="52" y="16" width="54" height="190" rx="26" fill="url(#vg1)" transform="rotate(-14 79 111)"/>
+      <rect x="120" y="30" width="48" height="160" rx="24" fill="url(#vg2)" transform="rotate(26 144 110)"/>
+      <rect x="66" y="24" width="15" height="96" rx="7.5" fill="#eef8ff" opacity=".5" transform="rotate(-14 79 111)"/>
+      <rect x="132" y="40" width="12" height="70" rx="6" fill="#f2faff" opacity=".45" transform="rotate(26 144 110)"/>
+    </svg>
+
+    <div class="hero-content">
+      <span class="badge">ASSESSORIA PARA CORRETORES HAPVIDA</span>
+      <h1>Você vende,<br><span class="gold">a gente cuida<br>do processo.</span></h1>
+      <p>Seu painel de suporte: jornada de onboarding, treinamentos, kit de marketing com a sua logo, banco de leads e o time Viver a um clique.</p>
+    </div>
+  </aside>
+
+  <!-- Painel direito -->
+  <main class="login">
+    <div class="login-inner">
+      <h2>Acesse seu painel</h2>
+      <p class="sub">Entre com o e-mail cadastrado na Viver.</p>
+
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" role="tab" aria-selected="true">Sou corretor</button>
+        <button type="button" class="tab" role="tab" aria-selected="false">Sou gestor</button>
+      </div>
+
+      <form id="login-form" novalidate>
+        <label for="email">E-mail</label>
+        <div class="field">
+          <input type="email" id="email" placeholder="voce@suacorretora.com.br" autocomplete="email">
+        </div>
+
+        <label for="senha">Senha</label>
+        <div class="field">
+          <input type="password" id="senha" placeholder="Sua senha" autocomplete="current-password">
+          <button type="button" class="toggle-pass" id="toggle-pass">Mostrar</button>
+        </div>
+
+        <div class="row">
+          <label class="check"><input type="checkbox" checked> Manter conectado</label>
+          <a href="#" onclick="return false;">Esqueci minha senha</a>
+        </div>
+
+        <button type="submit" class="btn">Entrar</button>
+      </form>
+
+      <div class="divider"><span>ACESSO DE DEMONSTRAÇÃO</span></div>
+
+      <div class="demo-cards">
+        <button type="button" class="demo-card" data-role="gestor">
+          <strong>Entrar como gestor</strong>
+          <span>vê as duas visões</span>
+        </button>
+        <button type="button" class="demo-card" data-role="corretor">
+          <strong>Entrar como corretor</strong>
+          <span>vê só a área do corretor</span>
+        </button>
+      </div>
+
+      <p class="foot">Versão de demonstração: qualquer senha é aceita.<br>viverassessoriacomercial.com.br</p>
+    </div>
+  </main>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+  // Alternância de abas
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+    tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+  }));
+
+  // Mostrar / ocultar senha
+  const senha = document.getElementById('senha');
+  const toggle = document.getElementById('toggle-pass');
+  toggle.addEventListener('click', () => {
+    const visivel = senha.type === 'text';
+    senha.type = visivel ? 'password' : 'text';
+    toggle.textContent = visivel ? 'Mostrar' : 'Ocultar';
+  });
+
+  // Toast simples
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // Entrar (demo)
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    toast('Versão de demonstração: qualquer senha é aceita.');
+  });
+
+  // Acesso de demonstração
+  document.querySelectorAll('.demo-card').forEach(card => {
+    card.addEventListener('click', () => {
+      toast('Entrando como ' + card.dataset.role + ' (demonstração)…');
+    });
+  });
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
