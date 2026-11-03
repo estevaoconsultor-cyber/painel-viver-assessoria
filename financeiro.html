@@ -237,7 +237,7 @@ table.tbl { width:100%; border-collapse:collapse; font-size:.78rem; }
 .res b { display:block; font-size:1.2rem; font-weight:800; margin-top:2px; }
 .note { font-size:.72rem; color:var(--txt3); margin-top:10px; line-height:1.5; }
 
-/* FERRAMENTAS (Estorno e Repique — trazidas do Simulador Vitra) */
+/* FERRAMENTAS (Estorno e Repique — trazidas do Simulador Vimuzzo) */
 .ferr { --primary-light:#fff7e6; --muted:var(--txt3); --primary-dark:var(--txt); --text:var(--txt); }
 .ferr .card-grid { display:grid; gap:12px; }
 .ferr .card-grid-2 { grid-template-columns:repeat(2,1fr); }
@@ -554,7 +554,7 @@ window.paSair = function() { try { if (window.parent && window.parent.fecharFina
         <div class="chart-card">
           <div class="cc-header"><div><div class="cc-title">Regra de estorno aplicada</div><div class="cc-sub" id="regraSub">Super Simples / PME</div></div></div>
           <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Cancelado</th><th>Estorna</th></tr></thead><tbody id="tbRegra"></tbody></table></div>
-          <p class="note">Mesma regra da Calculadora de Estorno do Simulador Vitra, agora ligada à carteira: cada cancelamento vira estorno previsto na Projeção.</p>
+          <p class="note">Mesma regra da Calculadora de Estorno do Simulador Vimuzzo, agora ligada à carteira: cada cancelamento vira estorno previsto na Projeção.</p>
         </div>
       </div>
 
@@ -571,13 +571,13 @@ window.paSair = function() { try { if (window.parent && window.parent.fecharFina
       </div>
     </section>
 
-    <!-- ══════════ 4b. FERRAMENTAS (copiadas do Simulador Vitra) ══════════ -->
+    <!-- ══════════ 4b. FERRAMENTAS (copiadas do Simulador Vimuzzo) ══════════ -->
     <section class="page ferr" id="p-ferramentas">
       <div class="charts-2">
 
         <!-- REPIQUE -->
         <div class="chart-card" id="tool-repique">
-          <div class="cc-header"><div><div class="cc-title">↩️ Calculadora de Repique</div><div class="cc-sub">Repique é quando um ex-beneficiário quer retornar à operadora. Mesmas regras do Simulador Vitra (Regras → Repique).</div></div></div>
+          <div class="cc-header"><div><div class="cc-title">↩️ Calculadora de Repique</div><div class="cc-sub">Repique é quando um ex-beneficiário quer retornar à operadora. Mesmas regras do Simulador Vimuzzo (Regras → Repique).</div></div></div>
           <div class="card-grid card-grid-2">
             <div class="form-group"><label class="form-label">Contrato anterior (que foi cancelado)</label>
               <select class="form-control" id="rep-ant" onchange="calcRepique()">
@@ -753,7 +753,7 @@ const LECOMS = [
   ['114201','688720 · Carla M.','Aberto','b-info',410],
   ['113998','655102 · JM Transp.','Em análise','b-warn',2300]
 ];
-// ── ESTORNO: copiado do Simulador Vitra (ferramenta Calculadora de Estorno) ──
+// ── ESTORNO: copiado do Simulador Vimuzzo (ferramenta Calculadora de Estorno) ──
 const ESTORNO_REGRAS = {
   pf: [
     {ate:2, txt:'100% do AG da 1ª parcela', calc:ag => ag[0]},
@@ -824,7 +824,7 @@ function calcEstorno(){
     + (conta ? ' → ' + conta + ' = <strong>' + brl(v) + '</strong>' : '') + '.</div>';
 }
 
-// ── REPIQUE: copiado do Simulador Vitra (ferramenta Calculadora de Repique) ──
+// ── REPIQUE: copiado do Simulador Vimuzzo (ferramenta Calculadora de Repique) ──
 //    + campo "Início da vigência do contrato anterior"
 //    + aviso da data em que o plano pode ser feito sem repique
 function repDataParaDias(){
@@ -913,8 +913,8 @@ const TITULOS = {
   visao:      ['Alma Financeira da Carteira','Como a sua carteira respira dentro da operadora — recebido, recorrente e pendente'],
   relatorios: ['Relatórios de Comissão','Anexe o extrato da Hapvida e construa o histórico da carteira'],
   projecao:   ['Projeção de Crescimento','Vendas, vitalício, próximos agenciamentos, estornos e repiques'],
-  simulador:  ['Simulador Financeiro','O modelo ideal de comissão, com as regras do Simulador Vitra'],
-  ferramentas:['Ferramentas','Calculadoras de Repique e de Estorno, trazidas do Simulador Vitra'],
+  simulador:  ['Simulador Financeiro','O modelo ideal de comissão, com as regras do Simulador Vimuzzo'],
+  ferramentas:['Ferramentas','Calculadoras de Repique e de Estorno, trazidas do Simulador Vimuzzo'],
   alertas:    ['Alertas & LECOM','Comissões a cobrar e chamados abertos na operadora']
 };
 const feitos = {};
