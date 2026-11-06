@@ -210,11 +210,10 @@ function ultimasAtualizacoes(id){
 }
 function blocoAtualizacoes(p){
   const its = ultimasAtualizacoes(p.id);
-  return `<div class="vc-upd" aria-live="polite"><div class="vc-upd-h">Últimas atualizações<small>Hapvida e pendências</small></div>
+  return `<div class="vc-upd"><div class="vc-upd-h">Últimas atualizações<small>Hapvida e pendências</small></div>
     ${its.length?`<ol>${its.slice(0,6).map(i=>`<li class="${i.tipo}"><div class="vc-upd-l"><span class="vc-upd-tag">${i.tipo==="pend"?"Pendência":"Hapvida"}</span><span class="vc-upd-q num">${quandoFmt(i.em)}</span></div>
-      <p>${esc(i.texto)}${i.extra?`<br><small>${esc(i.extra)}</small>`:""}</p>${i.prazo?`<small class="num">Prazo de análise: ${fmtData(i.prazo)}</small>`:""}${i.por&&!/planilha/i.test(i.por)?`<small>por ${esc(String(i.por).replace("@"+DOMINIO_LOGIN,""))}</small>`:""}</li>`).join("")}</ol>${its.length>6?`<small class="vc-upd-mais">+${its.length-6} anteriores na ficha</small>`:""}`
-      :`<p class="vc-upd-vazio">Nenhuma movimentação da Hapvida ou pendência registrada ainda.</p>`}
-    <button type="button" class="btn sm" data-ficha="${p.id}">Abrir ficha e editar</button></div>`;
+      <p>${esc(i.texto)}${i.extra?`<br><small>${esc(i.extra)}</small>`:""}</p>${i.prazo?`<small class="num">Prazo de análise: ${fmtData(i.prazo)}</small>`:""}${i.por&&!/planilha/i.test(i.por)?`<small>por ${esc(String(i.por).replace("@"+DOMINIO_LOGIN,""))}</small>`:""}</li>`).join("")}</ol>${its.length>6?`<small class="vc-upd-mais">+${its.length-6} anteriores no histórico</small>`:""}`
+      :`<p class="vc-upd-vazio">Nenhuma movimentação da Hapvida ou pendência registrada ainda.</p>`}</div>`;
 }
 VIEWS.esteira = function(){
   const lista = EST.filter(p=>estFiltro==="todos"||p.tipo===estFiltro);
@@ -236,7 +235,7 @@ VIEWS.esteira = function(){
     </button>`; };
   const ordem = (x,y)=>{ const sx=estStatus(x), sy=estStatus(y); return (sy.d-sy.sla)-(sx.d-sx.sla); };
   const col = (r,titulo)=>{ const ps=lista.filter(p=>estResp(p)===r).sort(r==="concluido"?(x,y)=>estAtual(y).ini-estAtual(x).ini:ordem);
-    return `<div class="col"><div class="col-h" style="--rc:${RESP[r].c}"><b>${titulo}</b><span class="num">${ps.length}</span></div>${ps.length?`<div class="col-cards">${ps.map(p=>card(p)+(estSel===p.id?blocoAtualizacoes(p):"")).join("")}</div>${ps.length>5?`<div class="col-mais">Role para ver os outros ${ps.length-5} ↓</div>`:""}`:`<div class="col-empty">Nada aqui agora.</div>`}</div>`; };
+    return `<div class="col"><div class="col-h" style="--rc:${RESP[r].c}"><b>${titulo}</b><span class="num">${ps.length}</span></div>${ps.length?`<div class="col-cards">${ps.map(card).join("")}</div>${ps.length>5?`<div class="col-mais">Role para ver os outros ${ps.length-5} ↓</div>`:""}`:`<div class="col-empty">Nada aqui agora.</div>`}</div>`; };
   const podeSla = ehGestorViver();
   return `
   <div class="grid kpis">
@@ -257,13 +256,53 @@ VIEWS.esteira = function(){
   </div>`;
 };
 
+// ── janela do corretor na esteira: dados para completar, status, últimas atualizações e histórico ──
+let estCad=false, estFoco=null;
+function fecharFichaEsteira(){
+  estSel=null; estEdit=false; estCad=false;
+  const d=$("#estDet"); if(d) d.innerHTML="";
+  document.body.classList.remove("ficha-aberta");
+  document.querySelectorAll(".vcard[aria-pressed=true]").forEach(b=>b.setAttribute("aria-pressed","false"));
+  if(estFoco&&document.body.contains(estFoco)) estFoco.focus(); estFoco=null;
+}
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&document.body.classList.contains("ficha-aberta")) fecharFichaEsteira(); });
+function fichaEsteira(){
+  const p=EST.find(x=>x.id===estSel), box=$("#estDet"); if(!box) return;
+  if(!p){ box.innerHTML=""; document.body.classList.remove("ficha-aberta"); return; }
+  document.querySelectorAll(".vcard").forEach(b=>b.setAttribute("aria-pressed", String(+b.dataset.proc===estSel)));
+  $("#estModal").querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
+    const act=b.dataset.act;
+    if(act==="pendForm"){ $("#fPend").hidden=false; $("#pMot").focus(); return; }
+    if(act==="editar"){ estEdit=true; $("#fStatus").hidden=false; $("#sQuem").focus(); return; }
+    b.disabled=true;
+    if(act==="avancar"){ const n=p.etapa+1, e=fl.etapas[n];
+      await atualizarCorretora(p.id,{est_etapa:n, com_quem:e.resp, est_pend:false, pendencia:null, situacao:e.t}, e.resp==="concluido"?"Vínculo concluído":`Agora com ${RESP[e.resp].t}: ${e.t}`); }
+    if(act==="resolver"){ const e=fl.etapas[p.etapa];
+      await atualizarCorretora(p.id,{est_pend:false, com_quem:e.resp, pendencia:null}, `Pendência resolvida: volta para ${RESP[e.resp].t}`); }
+  });
+  const fp=$("#fPend"); fp.addEventListener("submit",async e=>{e.preventDefault(); const m=$("#pMot").value.trim(); if(!m){$("#pErr").textContent="Descreva a pendência para o corretor saber o que resolver.";return}
+    await atualizarCorretora(p.id,{est_pend:true, com_quem:"corretor", pendencia:m}, "Pendência registrada: agora com o corretor"); });
+  $("#sCancel").onclick=()=>{ estEdit=false; $("#fStatus").hidden=true; };
+  $("#sQuem").onchange=()=>{ const q=$("#sQuem").value; if(q==="concluido") $("#sEtapa").value=String(fl.etapas.length-1); else if($("#sEtapa").value===String(fl.etapas.length-1)) $("#sEtapa").value=String(ETAPA_DE[q]||0); };
+  $("#sEtapa").onchange=()=>{ const i=+$("#sEtapa").value, resp=fl.etapas[i].resp; if(resp==="concluido") $("#sQuem").value="concluido"; else if($("#sQuem").value==="concluido") $("#sQuem").value=resp; };
+  $("#fStatus").addEventListener("submit",async e=>{e.preventDefault();
+    const quem=$("#sQuem").value, pend=$("#sPend").value.trim(), prazo=$("#sPrazo").value||null;
+    let et=+$("#sEtapa").value; if(quem==="concluido") et=fl.etapas.length-1; else if(et===fl.etapas.length-1) et=Math.max(0,ETAPA_DE[quem]||0);
+    if(prazo&&prazo<isoHoje()){ $("#sErr").textContent="O novo prazo não pode ser uma data passada."; return; }
+    const campos={com_quem:quem, est_etapa:et, est_pend:quem==="corretor"&&!!pend, pendencia:pend||null, prazo:quem==="concluido"||quem==="declinado"?null:prazo, situacao:$("#sSit").value.trim()||null};
+    estEdit=false;
+    const ok=await atualizarCorretora(p.id,campos, quem==="declinado"?"Corretora marcada como declinada (sai da esteira)":quem==="concluido"?"Corretor concluído":"Status atualizado");
+    if(ok&&quem==="declinado") estSel=null;
+  });
+}
+
 async function atualizarCorretora(id, campos, msgOk){
   const {error} = await sb.from("corretoras").update(campos).eq("id", id);
   if(error){ toast("Não foi possível salvar: "+error.message); return false; }
   await recarregar(msgOk); return true;
 }
-function lerResponsaveis(){
-  return [...document.querySelectorAll("#nResps .nv-resp")].map(l=>{ const o={}; l.querySelectorAll("[data-rf]").forEach(i=>o[i.dataset.rf]=i.value.trim()); return o; }).filter(r=>r.nome||r.telefone||r.email);
+function lerResponsaveis(box="#nResps"){
+  return [...document.querySelectorAll(box+" .nv-resp")].map(l=>{ const o={}; l.querySelectorAll("[data-rf]").forEach(i=>o[i.dataset.rf]=i.value.trim()); return o; }).filter(r=>r.nome||r.telefone||r.email);
 }
 AFTER.esteira = function(){
   $("#estFil").addEventListener("click",e=>{const b=e.target.closest("[data-ef]");if(!b)return;estFiltro=b.dataset.ef;render()});
@@ -304,9 +343,8 @@ AFTER.esteira = function(){
     });
   }
   $(".board").addEventListener("click",e=>{
-    const f=e.target.closest("[data-ficha]"); if(f){ $("#estDet").scrollIntoView({behavior:"smooth",block:"start"}); return; }
-    const c=e.target.closest("[data-proc]");if(!c)return;estEdit=false;estSel=+c.dataset.proc===estSel?null:+c.dataset.proc;render();
-    if(estSel){ const sel=document.querySelector(`.vcard[data-proc="${estSel}"]`), cx=sel&&sel.closest(".col-cards"); if(cx){ cx.scrollTop=Math.max(0,sel.offsetTop-4); } }
+    const c=e.target.closest("[data-proc]"); if(!c) return;
+    estEdit=false; estCad=false; estSel=+c.dataset.proc; estFoco=c; fichaEsteira();
   });
   // cada coluna mostra no máximo 5 corretores; os demais aparecem rolando a coluna
   document.querySelectorAll(".col-cards").forEach(cx=>{
@@ -325,67 +363,7 @@ AFTER.esteira = function(){
     if(error) toast("SLA não foi salvo: "+error.message); else toast("SLA atualizado para todos");
     render();
   }));
-  const p=EST.find(x=>x.id===estSel); if(!p) return;
-  const fl=FLUXOS[p.tipo], a=estAtual(p), st=estStatus(p), tot=estTotais(p), fim=a.resp==="concluido", r=p._row||{};
-  const prox=fl.etapas[p.etapa+1];
-  const resps=(r.responsaveis||[]);
-  const ficha=[["CNPJ",r.cnpj?fmtCnpj(r.cnpj):"—"],["Razão social",r.nome],["Código Hapvida",r.codigo||(r.tem_codigo===false?"Abrir código novo":"—")],["Grade de comissão",r.grade_comissao||"—"],["Chamado",r.chamado||"—"]];
-  const opcoesQuem = ["viver","corretor","hapvida","concluido","declinado"].map(k=>`<option value="${k}" ${r.com_quem===k?"selected":""}>${k==="concluido"?(p.tipo==="novo"?"Concluído · código aberto":"Concluído · vínculo finalizado"):COM_QUEM[k]}</option>`).join("");
-  const opcoesEtapa = fl.etapas.map((e,i)=>`<option value="${i}" ${i===(r.est_etapa??p.etapa)?"selected":""}>${i+1}. ${esc(e.t)}</option>`).join("");
-  $("#estDet").innerHTML=`<div class="card" style="margin-top:16px">
-    <div class="card-h"><div><h2>${esc(p.corretora)}</h2><p class="num">${esc(p.cnpj)} · ${esc(p.corretor)} · ${fl.nome} · iniciado em ${fmtD(p.hist[0].ini)}</p></div><span class="chip ${st.k}">${st.t}</span></div>
-    <div class="ficha">${ficha.map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>
-    ${resps.length?`<div class="ficha-resp">${resps.map(x=>`<div><b>${esc(x.nome||"Responsável")}</b><span class="num">${[x.telefone?fmtTel(x.telefone):"",x.email||""].filter(Boolean).map(esc).join(" · ")||"sem contato"}</span>${x.telefone&&soDig(x.telefone).length>=10?`<a class="btn sm wa" target="_blank" rel="noopener" href="${wa("55"+soDig(x.telefone))}">WhatsApp</a>`:""}</div>`).join("")}</div>`:""}
-    ${r.situacao?`<p class="note" style="margin-top:10px"><b>Situação:</b> ${esc(r.situacao)}</p>`:""}
-    ${r.pendencia?`<p class="note" style="margin-top:4px;color:var(--gold)"><b>Pendência:</b> ${esc(r.pendencia)}${r.prazo?` · prazo de análise até ${fmtData(r.prazo)}`:""}</p>`:r.prazo?`<p class="note" style="margin-top:4px"><b>Prazo de análise:</b> até ${fmtData(r.prazo)}</p>`:""}
-    <div class="tot">${["viver","corretor","hapvida"].map(x=>`<div><span class="resp" style="--rc:${RESP[x].c}">${RESP[x].t}</span><b class="num">${tot[x]} dia${tot[x]!==1?"s":""}</b></div>`).join("")}<div><span class="note">Total</span><b class="num">${diasDesde(p.hist[0].ini,fim?a.ini:null)} dias</b></div></div>
-    <h3 style="margin:16px 0 4px">Histórico na esteira</h3>
-    <div class="tl">${p.hist.map(h=>{const d=diasDesde(h.ini,h.fim);return `<div class="tl-r"><span class="resp" style="--rc:${RESP[h.resp].c}">${RESP[h.resp].t}</span><span>${h.pend?`<b style="color:var(--gold)">${esc(h.t)}</b>`:esc(h.t)}<br><small class="num">${fmtD(h.ini)}${h.fim?` → ${fmtD(h.fim)}`:" → agora"}</small></span><span class="num" style="font-weight:600">${h.resp==="concluido"?"":`${d} dia${d!==1?"s":""}`}</span></div>`}).join("")}</div>
-    <div class="row" style="margin-top:14px">
-      ${fim?"":a.pend?`<button class="btn pri" data-act="resolver">Pendência resolvida: volta para ${RESP[fl.etapas[p.etapa].resp].t}</button>`:prox?`<button class="btn pri" data-act="avancar">Avançar: ${esc(prox.t)}</button>`:""}
-      ${fim||a.pend?"":`<button class="btn" data-act="pendForm">Devolver ao corretor com pendência</button>`}
-      <button class="btn" data-act="editar">Editar status e pendência</button>
-    </div>
-    <form class="form" id="fPend" hidden style="margin-top:12px;grid-template-columns:minmax(0,1fr) auto;align-items:end">
-      <label for="pMot">Qual é a pendência?<input id="pMot" placeholder="Ex.: comprovante bancário em conta PF"></label>
-      <button class="btn pri" type="submit">Registrar pendência</button><div id="pErr" class="note" style="color:var(--crit)"></div></form>
-    <form class="form" id="fStatus" ${estEdit?"":"hidden"} style="margin-top:12px">
-      <div class="nv-grid">
-        <label for="sQuem">Status: com quem está<select id="sQuem">${opcoesQuem}</select></label>
-        <label for="sEtapa">Etapa<select id="sEtapa">${opcoesEtapa}</select></label>
-        <label for="sPrazo">Novo prazo de análise<input id="sPrazo" type="date" min="${isoHoje()}" value="${r.prazo&&r.prazo>=isoHoje()?r.prazo:""}"></label>
-      </div>
-      <label for="sPend">Pendência<input id="sPend" value="${esc(r.pendencia||"")}" placeholder="O que falta para seguir (deixe em branco se não houver)"></label>
-      <label for="sSit">Situação / observação<input id="sSit" value="${esc(r.situacao||"")}" placeholder="Ex.: LECOM aberto, aguardando operadora"></label>
-      <p class="note">Sem novo prazo, vale o SLA padrão da etapa. Se o prazo vencer sem atualização, o processo aparece em atraso para todos.</p>
-      <div class="row"><button class="btn pri" type="submit">Salvar status</button><button class="btn" type="button" id="sCancel">Cancelar</button></div>
-      <div id="sErr" class="note" style="color:var(--crit)"></div>
-    </form>
-  </div>`;
-  $("#estDet").querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
-    const act=b.dataset.act;
-    if(act==="pendForm"){ $("#fPend").hidden=false; $("#pMot").focus(); return; }
-    if(act==="editar"){ estEdit=true; $("#fStatus").hidden=false; $("#sQuem").focus(); return; }
-    b.disabled=true;
-    if(act==="avancar"){ const n=p.etapa+1, e=fl.etapas[n];
-      await atualizarCorretora(p.id,{est_etapa:n, com_quem:e.resp, est_pend:false, pendencia:null, situacao:e.t}, e.resp==="concluido"?"Vínculo concluído":`Agora com ${RESP[e.resp].t}: ${e.t}`); }
-    if(act==="resolver"){ const e=fl.etapas[p.etapa];
-      await atualizarCorretora(p.id,{est_pend:false, com_quem:e.resp, pendencia:null}, `Pendência resolvida: volta para ${RESP[e.resp].t}`); }
-  });
-  const fp=$("#fPend"); fp.addEventListener("submit",async e=>{e.preventDefault(); const m=$("#pMot").value.trim(); if(!m){$("#pErr").textContent="Descreva a pendência para o corretor saber o que resolver.";return}
-    await atualizarCorretora(p.id,{est_pend:true, com_quem:"corretor", pendencia:m}, "Pendência registrada: agora com o corretor"); });
-  $("#sCancel").onclick=()=>{ estEdit=false; $("#fStatus").hidden=true; };
-  $("#sQuem").onchange=()=>{ const q=$("#sQuem").value; if(q==="concluido") $("#sEtapa").value=String(fl.etapas.length-1); else if($("#sEtapa").value===String(fl.etapas.length-1)) $("#sEtapa").value=String(ETAPA_DE[q]||0); };
-  $("#sEtapa").onchange=()=>{ const i=+$("#sEtapa").value, resp=fl.etapas[i].resp; if(resp==="concluido") $("#sQuem").value="concluido"; else if($("#sQuem").value==="concluido") $("#sQuem").value=resp; };
-  $("#fStatus").addEventListener("submit",async e=>{e.preventDefault();
-    const quem=$("#sQuem").value, pend=$("#sPend").value.trim(), prazo=$("#sPrazo").value||null;
-    let et=+$("#sEtapa").value; if(quem==="concluido") et=fl.etapas.length-1; else if(et===fl.etapas.length-1) et=Math.max(0,ETAPA_DE[quem]||0);
-    if(prazo&&prazo<isoHoje()){ $("#sErr").textContent="O novo prazo não pode ser uma data passada."; return; }
-    const campos={com_quem:quem, est_etapa:et, est_pend:quem==="corretor"&&!!pend, pendencia:pend||null, prazo:quem==="concluido"||quem==="declinado"?null:prazo, situacao:$("#sSit").value.trim()||null};
-    estEdit=false;
-    const ok=await atualizarCorretora(p.id,campos, quem==="declinado"?"Corretora marcada como declinada (sai da esteira)":quem==="concluido"?"Corretor concluído":"Status atualizado");
-    if(ok&&quem==="declinado") estSel=null;
-  });
+  fichaEsteira();
 };
 
 /* ───────── ACESSOS (só gestor Viver) ───────── */
