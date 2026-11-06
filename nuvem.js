@@ -270,6 +270,103 @@ function fichaEsteira(){
   const p=EST.find(x=>x.id===estSel), box=$("#estDet"); if(!box) return;
   if(!p){ box.innerHTML=""; document.body.classList.remove("ficha-aberta"); return; }
   document.querySelectorAll(".vcard").forEach(b=>b.setAttribute("aria-pressed", String(+b.dataset.proc===estSel)));
+  const fl=FLUXOS[p.tipo], a=estAtual(p), st=estStatus(p), tot=estTotais(p), fim=a.resp==="concluido", r=p._row||{};
+  const prox=fl.etapas[p.etapa+1];
+  const resps=(r.responsaveis||[]);
+  const faltam=[!r.cnpj&&"CNPJ", r.tem_codigo!==false&&!r.codigo&&"código Hapvida", !r.grade_comissao&&"grade de comissão", !resps.some(x=>x.nome)&&"responsável", !resps.some(x=>soDig(x.telefone).length>=10)&&"telefone", !resps.some(x=>x.email)&&"e-mail"].filter(Boolean);
+  const ficha=[["CNPJ",r.cnpj?fmtCnpj(r.cnpj):""],["Razão social",r.nome],["Código Hapvida",r.codigo||(r.tem_codigo===false?"Abrir código novo":"")],["Grade de comissão",r.grade_comissao||""],["Chamado",r.chamado||""]];
+  const opcoesQuem = ["viver","corretor","hapvida","concluido","declinado"].map(k=>`<option value="${k}" ${r.com_quem===k?"selected":""}>${k==="concluido"?(p.tipo==="novo"?"Concluído · código aberto":"Concluído · vínculo finalizado"):COM_QUEM[k]}</option>`).join("");
+  const opcoesEtapa = fl.etapas.map((e,i)=>`<option value="${i}" ${i===(r.est_etapa??p.etapa)?"selected":""}>${i+1}. ${esc(e.t)}</option>`).join("");
+  const grades=[...new Set([...GRADES_SUGERIDAS, ...N.corretoras.map(c=>c.grade_comissao).filter(Boolean)])];
+  box.innerHTML=`<div class="est-modal" id="estModal"><div class="est-box" role="dialog" aria-modal="true" aria-labelledby="estModalT">
+    <div class="est-top"><div><span class="tipo ${p.tipo==="novo"?"novo":""}">${fl.curto}</span><h2 id="estModalT">${esc(p.corretora)}</h2><p class="num">${esc(p.cnpj)} · ${esc(p.corretor)} · iniciado em ${fmtD(p.hist[0].ini)}</p></div>
+      <div class="est-top-d"><span class="chip ${st.k}">${st.t}</span><button type="button" class="est-x" id="estFechar" aria-label="Fechar">✕</button></div></div>
+    <div class="est-cols">
+      <div class="est-col">
+        <section class="est-sec"><div class="est-sec-h"><h3>Dados do corretor</h3><button class="btn sm" type="button" id="estCadBtn">${faltam.length?"Adicionar dados":"Editar dados"}</button></div>
+          ${faltam.length?`<div class="est-falta">Faltam: <b>${faltam.join(", ")}</b></div>`:""}
+          <div class="ficha">${ficha.map(([k,v])=>`<div class="${v?"":"vazio"}"><span>${k}</span><b>${v?esc(v):"a adicionar"}</b></div>`).join("")}</div>
+          ${resps.length?`<div class="ficha-resp">${resps.map(x=>`<div><b>${esc(x.nome||"Responsável")}</b><span class="num">${[x.telefone?fmtTel(x.telefone):"",x.email||""].filter(Boolean).map(esc).join(" · ")||"sem contato"}</span>${x.telefone&&soDig(x.telefone).length>=10?`<a class="btn sm wa" target="_blank" rel="noopener" href="${wa("55"+soDig(x.telefone))}">WhatsApp</a>`:""}</div>`).join("")}</div>`:""}
+          <form class="form" id="fCad" ${estCad?"":"hidden"} style="margin-top:12px">
+            <div class="nv-grid">
+              <label for="eCnpj">CNPJ<input id="eCnpj" inputmode="numeric" value="${esc(r.cnpj?fmtCnpj(r.cnpj):"")}" placeholder="00.000.000/0001-00"></label>
+              <label for="eRazao">Razão social<input id="eRazao" value="${esc(r.nome||"")}"></label>
+              <label for="eTemCod">Já possui código Hapvida?<select id="eTemCod"><option value="sim" ${r.tem_codigo!==false?"selected":""}>Sim, vincular o código existente</option><option value="nao" ${r.tem_codigo===false?"selected":""}>Não, abrir código novo</option></select></label>
+              <label for="eCod" id="eCodLbl" ${r.tem_codigo===false?"hidden":""}>Código Hapvida<input id="eCod" value="${esc(r.codigo||"")}" placeholder="Ex.: 54WF"></label>
+              <label for="eGrade">Grade de comissão escolhida<input id="eGrade" list="eGrades" value="${esc(r.grade_comissao||"")}" placeholder="Ex.: 300% + 2%"><datalist id="eGrades">${grades.map(g=>`<option value="${esc(g)}">`).join("")}</datalist></label>
+            </div>
+            <div class="nv-resp-h"><b>Responsáveis</b><button class="btn sm" type="button" id="eAddResp">+ Adicionar responsável</button></div>
+            <div id="eResps"></div>
+            <div class="row"><button class="btn pri" type="submit">Salvar dados</button><button class="btn" type="button" id="eCancel">Cancelar</button></div>
+            <div id="eErr" class="note" style="color:var(--crit)"></div>
+          </form>
+        </section>
+        <section class="est-sec"><div class="est-sec-h"><h3>Status na esteira</h3></div>
+          <div class="est-status"><span class="resp" style="--rc:${RESP[a.resp].c}">${RESP[a.resp].t}</span><span>${a.pend?`<b style="color:var(--gold)">${esc(a.t)}</b>`:esc(a.t)}</span></div>
+          ${r.situacao?`<p class="note" style="margin-top:8px"><b>Situação:</b> ${esc(r.situacao)}</p>`:""}
+          ${r.pendencia?`<p class="note" style="margin-top:4px;color:var(--gold)"><b>Pendência:</b> ${esc(r.pendencia)}${r.prazo?` · prazo de análise até ${fmtData(r.prazo)}`:""}</p>`:r.prazo?`<p class="note" style="margin-top:4px"><b>Prazo de análise:</b> até ${fmtData(r.prazo)}</p>`:""}
+          <div class="tot" style="margin-top:10px">${["viver","corretor","hapvida"].map(x=>`<div><span class="resp" style="--rc:${RESP[x].c}">${RESP[x].t}</span><b class="num">${tot[x]} dia${tot[x]!==1?"s":""}</b></div>`).join("")}<div><span class="note">Total</span><b class="num">${diasDesde(p.hist[0].ini,fim?a.ini:null)} dias</b></div></div>
+          <div class="row" style="margin-top:12px">
+            ${fim?"":a.pend?`<button class="btn pri" data-act="resolver">Pendência resolvida: volta para ${RESP[fl.etapas[p.etapa].resp].t}</button>`:prox?`<button class="btn pri" data-act="avancar">Avançar: ${esc(prox.t)}</button>`:""}
+            ${fim||a.pend?"":`<button class="btn" data-act="pendForm">Devolver ao corretor com pendência</button>`}
+            <button class="btn" data-act="editar">Editar status e pendência</button>
+          </div>
+          <form class="form" id="fPend" hidden style="margin-top:12px;grid-template-columns:minmax(0,1fr) auto;align-items:end">
+            <label for="pMot">Qual é a pendência?<input id="pMot" placeholder="Ex.: comprovante bancário em conta PF"></label>
+            <button class="btn pri" type="submit">Registrar pendência</button><div id="pErr" class="note" style="color:var(--crit)"></div></form>
+          <form class="form" id="fStatus" ${estEdit?"":"hidden"} style="margin-top:12px">
+            <div class="nv-grid">
+              <label for="sQuem">Status: com quem está<select id="sQuem">${opcoesQuem}</select></label>
+              <label for="sEtapa">Etapa<select id="sEtapa">${opcoesEtapa}</select></label>
+              <label for="sPrazo">Novo prazo de análise<input id="sPrazo" type="date" min="${isoHoje()}" value="${r.prazo&&r.prazo>=isoHoje()?r.prazo:""}"></label>
+            </div>
+            <label for="sPend">Pendência<input id="sPend" value="${esc(r.pendencia||"")}" placeholder="O que falta para seguir (deixe em branco se não houver)"></label>
+            <label for="sSit">Situação / observação<input id="sSit" value="${esc(r.situacao||"")}" placeholder="Ex.: LECOM aberto, aguardando operadora"></label>
+            <p class="note">Sem novo prazo, vale o SLA padrão da etapa. Se o prazo vencer sem atualização, o processo aparece em atraso para todos.</p>
+            <div class="row"><button class="btn pri" type="submit">Salvar status</button><button class="btn" type="button" id="sCancel">Cancelar</button></div>
+            <div id="sErr" class="note" style="color:var(--crit)"></div>
+          </form>
+        </section>
+      </div>
+      <div class="est-col">
+        <section class="est-sec">${blocoAtualizacoes(p)}</section>
+        <section class="est-sec"><div class="est-sec-h"><h3>Histórico na esteira</h3></div>
+          <div class="tl">${p.hist.map(h=>{const d=diasDesde(h.ini,h.fim);return `<div class="tl-r"><span class="resp" style="--rc:${RESP[h.resp].c}">${RESP[h.resp].t}</span><span>${h.pend?`<b style="color:var(--gold)">${esc(h.t)}</b>`:esc(h.t)}<br><small class="num">${fmtD(h.ini)}${h.fim?` → ${fmtD(h.fim)}`:" → agora"}</small></span><span class="num" style="font-weight:600">${h.resp==="concluido"?"":`${d} dia${d!==1?"s":""}`}</span></div>`}).join("")}</div>
+        </section>
+      </div>
+    </div>
+  </div></div>`;
+  document.body.classList.add("ficha-aberta");
+  const modal=$("#estModal");
+  modal.addEventListener("mousedown",e=>{ if(e.target===modal) fecharFichaEsteira(); });
+  $("#estFechar").onclick=fecharFichaEsteira;
+  if(!estCad && !estEdit) setTimeout(()=>{ const x=$("#estFechar"); if(x) x.focus({preventScroll:true}); },30);
+  // dados do corretor
+  let resps2=resps.length?resps.map(x=>({...x})):[{}];
+  const desenhar=()=>{ $("#eResps").innerHTML=resps2.map((x,i)=>linhaResp(i,x)).join(""); };
+  const guardar=()=>{ resps2=[...document.querySelectorAll("#eResps .nv-resp")].map(l=>{ const o={}; l.querySelectorAll("[data-rf]").forEach(i=>o[i.dataset.rf]=i.value); return o; }); };
+  desenhar();
+  $("#estCadBtn").onclick=()=>{ estCad=true; $("#fCad").hidden=false; $("#eCnpj").focus(); };
+  $("#eCancel").onclick=()=>{ estCad=false; $("#fCad").hidden=true; };
+  $("#eAddResp").onclick=()=>{ guardar(); resps2.push({}); desenhar(); const ls=document.querySelectorAll("#eResps .nv-resp [data-rf=nome]"); ls[ls.length-1].focus(); };
+  $("#eResps").onclick=e=>{ const b=e.target.closest("[data-rmresp]"); if(!b) return; guardar(); resps2.splice(+b.dataset.rmresp,1); if(!resps2.length) resps2=[{}]; desenhar(); };
+  $("#eTemCod").onchange=()=>{ $("#eCodLbl").hidden=$("#eTemCod").value!=="sim"; };
+  $("#fCad").addEventListener("submit",async e=>{e.preventDefault();
+    const err=t=>{$("#eErr").textContent=t;};
+    const cnpj=soDig($("#eCnpj").value), razao=$("#eRazao").value.trim(), temCod=$("#eTemCod").value==="sim", cod=$("#eCod").value.trim().toUpperCase(), grade=$("#eGrade").value.trim();
+    const rs=lerResponsaveis("#eResps");
+    if(cnpj && cnpj.length!==14) return err("O CNPJ precisa ter 14 números.");
+    if(!razao) return err("Informe a razão social.");
+    if(rs.some(x=>!x.nome)) return err("Informe o nome de cada responsável.");
+    if(rs.some(x=>x.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x.email))) return err("Confira o e-mail dos responsáveis.");
+    const dup=cnpj&&N.corretoras.find(c=>c.id!==p.id&&soDig(c.cnpj)===cnpj); if(dup) return err(`Este CNPJ já está na esteira: ${dup.nome}.`);
+    const campos={nome:razao, cnpj:cnpj||null, tem_codigo:temCod, codigo:temCod?(cod||null):null, grade_comissao:grade||null,
+      responsaveis:rs.map(x=>({nome:x.nome, telefone:x.telefone, email:(x.email||"").toLowerCase()})),
+      contato:rs.length?rs.map(x=>[x.nome,x.telefone].filter(Boolean).join(" - ")).join(" / "):r.contato, telefone:(rs.find(x=>x.telefone)||{}).telefone||null, email:(rs.find(x=>x.email)||{}).email||null};
+    if(temCod!==(r.tipo!=="novo")) campos.tipo=temCod?"existente":"novo";
+    estCad=false;
+    await atualizarCorretora(p.id, campos, "Dados do corretor salvos");
+  });
   $("#estModal").querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
     const act=b.dataset.act;
     if(act==="pendForm"){ $("#fPend").hidden=false; $("#pMot").focus(); return; }
@@ -588,3 +685,15 @@ document.addEventListener("visibilitychange",()=>{
   recarregar();
 });
 sb.auth.getSession().then(({data})=>{ if(data&&data.session) entrarNuvem(data.session.user,false); });
+// versão nova publicada: recarrega sozinho (quando ninguém está preenchendo algo), para ninguém ficar com o portal antigo aberto
+async function checarVersao(){
+  try{
+    const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"}); if(!r.ok) return;
+    const v=(await r.json()).v; if(!v||!window.VIVER_VERSAO||v===window.VIVER_VERSAO) return;
+    const ativo=document.activeElement, ocupado=(ativo&&ativo.closest&&ativo.closest("form"))||document.body.classList.contains("ficha-aberta")||(typeof CR!=="undefined"&&CR.ocupado);
+    if(ocupado){ toast("Há uma versão nova do portal. Ela abre quando você terminar o que está fazendo."); return; }
+    location.reload();
+  }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) checarVersao(); });
+setInterval(checarVersao, 3*60e3);
