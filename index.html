@@ -325,6 +325,7 @@ td .sm{color:var(--muted);font-size:.76rem}
 @keyframes crPulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
 .cr-boas{margin:auto;text-align:center;max-width:560px;color:var(--muted);font-size:.88rem}
 .cr-boas .cr-av{margin:0 auto;width:58px;height:58px;font-size:1.5rem}
+.cr-av{overflow:hidden;padding:0}.cr-av svg{display:block;width:100%;height:100%}
 .cr-boas h3{color:var(--fg);font-size:1.1rem;margin:12px 0 6px}
 .cr-sug{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
 .cr-sug button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:7px 12px;font-size:.78rem}
@@ -540,7 +541,7 @@ const ICON = {
   folder:'<path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',
   chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/>',
   chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
-  carol:'<path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.8 1.9L21.7 18l-1.9.8L19 20.7l-.8-1.9L16.3 18l1.9-1.1z"/>',
+  carol:'<path d="M7.6 13.8C6.8 12.3 6.6 10.6 6.8 9 7.3 5.5 9.4 3.6 12 3.6s4.7 1.9 5.2 5.4c.2 1.6 0 3.3-.8 4.8"/><path d="M8.4 8.6c1.9-.4 3.4-1.4 4.2-3 .9 1.5 2.3 2.5 3.9 2.9"/><path d="M8.6 9.2c0 2.6 1.5 4.6 3.4 4.6s3.4-2 3.4-4.6"/><path d="M5 20.6c.7-3.2 3.6-5.2 7-5.2s6.3 2 7 5.2"/>',
   ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/>',
   calc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v3M8 18h.01M12 18h.01"/>',
@@ -621,7 +622,7 @@ const MENUS = {
   gestor:[
     {lbl:"Acompanhamento"},
     {id:"visao",t:"Visão geral",i:"home"},
-    {id:"carol",t:"Carol · assistente",i:"carol"},
+    {id:"carol",t:"Carol",i:"carol"},
     {id:"simulador",t:"Simulador de preços",i:"calc",sub:true},
     {id:"financeiro",t:"Painel financeiro",i:"chart"},
     {id:"corretores",t:"Corretores vinculados",i:"users"},
@@ -637,7 +638,7 @@ const MENUS = {
   corretor:[
     {lbl:"Minha área"},
     {id:"inicio",t:"Início",i:"home"},
-    {id:"carol",t:"Carol · assistente",i:"carol"},
+    {id:"carol",t:"Carol",i:"carol"},
     {id:"simulador",t:"Simulador de preços",i:"calc",sub:true},
     {id:"jornada",t:"Minha jornada",i:"route"},
     {id:"treinos",t:"Treinamentos",i:"cap"},
@@ -968,17 +969,17 @@ function carolBoasVindas(){
   const sug = gestor
     ? ["Quem está com o SLA atrasado na esteira?","Quais corretores precisam de apoio?","Quais pedidos de apoio estão abertos?","Quais documentos para abrir código novo?","Quais campanhas valem agora?","Quem aceita cópia de carência especial?"]
     : ["Qual é o próximo passo da minha jornada?","Quais documentos preciso para abrir meu código?","Quais campanhas valem agora?","Quem aceita cópia de carência especial?","Como peço meu kit de design?","Como respondo um cliente que achou caro?"];
-  box.innerHTML='<div class="cr-boas"><div class="cr-av">C</div><h3>Oi! Eu sou a Carol.</h3><div>Pergunte sobre o portal, vendas, regras, campanhas, carências, documentos e rede. Pode escrever'+($("#cr-mic")&&!$("#cr-mic").hidden?" ou tocar no microfone e falar":"")+'.</div><div class="cr-sug">'+sug.map(s=>'<button type="button" data-crsug>'+crEsc(s)+'</button>').join("")+'</div></div>';
+  box.innerHTML='<div class="cr-boas"><div class="cr-av">'+CR_AV+'</div><h3>Oi! Eu sou a Carol.</h3><div>Pergunte sobre o portal, vendas, regras, campanhas, carências, documentos e rede. Pode escrever'+($("#cr-mic")&&!$("#cr-mic").hidden?" ou tocar no microfone e falar":"")+'.</div><div class="cr-sug">'+sug.map(s=>'<button type="button" data-crsug>'+crEsc(s)+'</button>').join("")+'</div></div>';
 }
 function carolRenderConversa(pensando){
   const box=$("#cr-msgs"); if(!box) return;
   let h="";
   CR.conversa.forEach((t,k)=>{
     h+='<div class="cr-m eu">'+(t.audio?'<span class="cr-aud">🎤</span>':"")+crEsc(t.p)+'</div>';
-    if(t.r) h+='<div class="cr-linha"><div class="cr-av">C</div><div class="cr-m ela">'+crFmt(t.r)+(t.parcial?"":'<div class="cr-acoes"><button type="button" data-crcopiar="'+k+'">Copiar resposta</button></div>')+'</div></div>';
-    if(t.erro) h+='<div class="cr-linha"><div class="cr-av">C</div><div class="cr-m ela erro">'+crEsc(t.erro)+'</div></div>';
+    if(t.r) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-m ela">'+crFmt(t.r)+(t.parcial?"":'<div class="cr-acoes"><button type="button" data-crcopiar="'+k+'">Copiar resposta</button></div>')+'</div></div>';
+    if(t.erro) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-m ela erro">'+crEsc(t.erro)+'</div></div>';
   });
-  if(pensando) h+='<div class="cr-linha"><div class="cr-av">C</div><div class="cr-pensando"><i></i><i></i><i></i> Carol está consultando as regras…</div></div>';
+  if(pensando) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-pensando"><i></i><i></i><i></i> Carol está consultando as regras…</div></div>';
   box.innerHTML=h; box.scrollTop=box.scrollHeight;
 }
 function carolAltura(el){ el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,140)+"px"; }
@@ -1025,6 +1026,7 @@ function carolMic(){
   $("#cr-rodape").textContent="Ouvindo… fale sua pergunta e toque no microfone de novo para enviar.";
 }
 function carolPararMic(cancelar){ CR.cancelou=!!cancelar; try{ CR.rec&&CR.rec.stop(); }catch(e){} }
+const CR_AV='<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M17 36c-1-14 5-24 15-24s16 10 15 24c-.4 6-2.2 11-4.5 14h-21C19.2 47 17.4 42 17 36z" fill="#3A2318"/><path d="M10 66c1.5-10 10-16 22-16s20.5 6 22 16z" fill="#EAF4FF"/><path d="M26 52c1.8 2.6 3.8 3.8 6 3.8s4.2-1.2 6-3.8" fill="none" stroke="#9cc8f2" stroke-width="2"/><path d="M28.2 41h7.6v9.5c-1.2 1.5-2.5 2.2-3.8 2.2s-2.6-.7-3.8-2.2z" fill="#E9B894"/><ellipse cx="32" cy="32" rx="10.5" ry="12.5" fill="#F6D1B3"/><path d="M21.2 31.5c-.4-9.6 4.6-15 11.3-15 6.4 0 10.9 4.8 10.6 12.6-4.8-.7-9.4-3.6-11.6-8.2-2.1 5.4-6 9-10.3 10.6z" fill="#3A2318"/><circle cx="28" cy="33" r="1.25" fill="#3A2318"/><circle cx="36" cy="33" r="1.25" fill="#3A2318"/><path d="M28.8 38.2c1.9 1.6 4.5 1.6 6.4 0" fill="none" stroke="#C2706A" stroke-width="1.5" stroke-linecap="round"/><circle cx="25.4" cy="36.6" r="1.6" fill="#F2A99A" opacity=".55"/><circle cx="38.6" cy="36.6" r="1.6" fill="#F2A99A" opacity=".55"/></svg>';   // avatar da Carol
 const CR_RODAPE="A Carol usa as regras do Simulador e as informações do portal. Confira sempre as condições antes de fechar.";
 const VIEWS = {
 /* ---------- GESTOR ---------- */
@@ -1121,7 +1123,7 @@ carol(){
       <div class="cr-hist-lista" id="cr-hist-lista"><div class="cr-vazio">Carregando…</div></div>
     </aside>
     <section class="cr-chat">
-      <div class="cr-topo"><div class="cr-av">C</div><div><strong>Carol</strong><span>Assistente da Viver · portal, vendas, regras, campanhas e rede</span></div>
+      <div class="cr-topo"><div class="cr-av">${CR_AV}</div><div><strong>Carol</strong><span>Assistente da Viver · portal, vendas, regras, campanhas e rede</span></div>
         <button type="button" class="cr-hist-btn" id="cr-hist-btn">Histórico</button></div>
       <div class="cr-msgs" id="cr-msgs" aria-live="polite"></div>
       <div class="cr-entrada">
