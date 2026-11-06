@@ -573,7 +573,7 @@ function sairNuvem(){
   if(N.canal){ try{ sb.removeChannel(N.canal); }catch(e){} N.canal=null; }
   N.perfil=null; N.uid=null; N.usuarios=null; N.acResult=null; USER=null; window.VIVER_GESTOR=false;
   C.length=0; EST=[]; PED=[]; estSel=null; estNovo=false;
-  fecharFinanceiro(); $("#app").hidden=true; $("#login").hidden=false; $("#fab").hidden=true; closeSide(); $("#lSenha").value=""; $("#lMsg").hidden=true;
+  descarregarFinanceiro(); $("#app").hidden=true; $("#login").hidden=false; $("#fab").hidden=true; closeSide(); $("#lSenha").value=""; $("#lMsg").hidden=true;
 }
 $("#logout").onclick=async()=>{ try{ await sb.auth.signOut(); }catch(e){} sairNuvem(); };
 sb.auth.onAuthStateChange((ev)=>{ if(ev==="SIGNED_OUT" && USER) sairNuvem(); });

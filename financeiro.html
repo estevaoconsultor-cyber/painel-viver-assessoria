@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulse Analytics — Financeiro</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
+<title>Viver Assessoria — Financeiro</title>
+<script src="chart.umd.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    TOKENS DE DESIGN — mesmo padrão Sinistralidade / RN518
@@ -291,7 +291,7 @@ table.tbl { width:100%; border-collapse:collapse; font-size:.78rem; }
 <style>html.pa-guard body{visibility:hidden!important}</style>
 <script>
 // ── ACESSO NO PORTAL VIVER: abre só dentro do painel da Viver, para quem entrou como gestor ──
-// (no portal Viver não há login do Pulse Analytics; o painel não conecta em nenhum banco)
+// (no portal Viver o painel não tem login próprio e não conecta em nenhum banco)
 document.documentElement.classList.add('pa-guard');
 window.paSair = function() { try { if (window.parent && window.parent.fecharFinanceiro) { window.parent.fecharFinanceiro(); return; } } catch (e) {} window.location.href = 'index.html'; };
 (function() {
@@ -312,7 +312,7 @@ window.paSair = function() { try { if (window.parent && window.parent.fecharFina
     <a href="#" onclick="paSair();return false;" class="sb-back">← Voltar ao painel</a>
     <div class="sb-logo">
       <div class="sb-logo-icon">💰</div>
-      <div class="sb-logo-text"><strong>FinancePRO</strong><span>Pulse Analytics</span></div>
+      <div class="sb-logo-text"><strong>FinancePRO</strong><span>Viver Assessoria</span></div>
     </div>
   </div>
   <div class="sb-client">
@@ -331,7 +331,7 @@ window.paSair = function() { try { if (window.parent && window.parent.fecharFina
     <a class="nav-item" data-p="alertas" onclick="ir('alertas')">🚨 Alertas & LECOM <span class="nav-badge">7</span></a>
   </nav>
   <div class="sb-footer">
-    <div class="sb-footer-info">Último relatório: <strong>Out/2026</strong><br>Pulse Analytics · Financeiro</div>
+    <div class="sb-footer-info">Último relatório: <strong>Out/2026</strong><br>Viver Assessoria · Financeiro</div>
   </div>
 </aside>
 
