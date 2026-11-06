@@ -401,8 +401,8 @@ body.vitra-solo #content{padding:20px}
 .step.active{background:#1F4E79!important;color:#A9E4D6!important;border-color:#1F4E79!important}
 .step.done{background:#E4F0FC!important;color:#1F6FB8!important;border-color:#9CC8EE!important}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" integrity="sha384-fCAW/rDWORTbQXSiB7mOg0QtQ5c+r0f544y6XoKjuVva0nMBlCpNUjiFeG5iMdS3" crossorigin="anonymous"></script>
+<script src="jspdf.umd.min.js"></script>
+<script src="jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -692,6 +692,7 @@ body.vitra-solo #content{padding:20px}
       <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
         <button class="btn btn-secondary" onclick="goSimStep(5)">Ajustar</button>
         <button class="btn btn-primary" onclick="gerarPDF()" style="background:linear-gradient(135deg,#c0392b,#e74c3c)">Gerar PDF</button>
+        <button class="btn btn-success" onclick="abrirEnvioWhats()" style="background:#25D366;border-color:#25D366;color:#fff">💬 Enviar pelo WhatsApp</button>
         <button class="btn btn-secondary" onclick="novaSimulacao()">Nova Simulação</button>
       </div>
     </div>
@@ -2181,6 +2182,8 @@ const REGIOES_VENDA = [
   {id:'sudeste', nome:'Região Sudeste', emoji:'🌆', desc:'São Paulo, Interior de São Paulo, Rio de Janeiro e Minas Gerais', pracas:['saopaulo','interiorsp','riodejaneiro','minas']},
   {id:'nordeste', nome:'Região Nordeste', emoji:'🌴', desc:'Fortaleza', pracas:['fortaleza']}
 ];
+// Viver: na simulação de preços só a Região Sudeste, com São Paulo e Rio de Janeiro (abas Regras e Rede continuam com REGIOES_VENDA)
+const REGIOES_SIM = [{id:'sudeste', nome:'Região Sudeste', emoji:'🌆', desc:'São Paulo e Rio de Janeiro', pracas:['saopaulo','riodejaneiro']}];
 const PRACAS = {
   saopaulo:    {nome:'São Paulo', uf:'SP', emoji:'🏙️', desc:'Todas as filiais de São Paulo: Capital, ABC, Mogi, Santos, Campinas, Jundiaí, Sorocaba, Americana e São José dos Campos', filiais:['sp','sbc','mogi','santos','campinas','jundiai','sorocaba','americana','sjc']},
   interiorsp:  {nome:'Interior de São Paulo', uf:'SP', emoji:'🌳', desc:'Campinas, Jundiaí, Sorocaba, Americana e Vale do Paraíba', filiais:['campinas','jundiai','sorocaba','americana','sjc']},
@@ -2223,7 +2226,7 @@ function regMaisProximas(c){
 }
 function regEscolherRegiao(id){
   regState = {regiao:id, praca:null, cidade:null, filialDireta:null};
-  const r = REGIOES_VENDA.find(x=>x.id===id);
+  const r = REGIOES_SIM.find(x=>x.id===id);
   if(r && r.pracas.length===1) regState.praca = r.pracas[0];   // Nordeste: só Fortaleza, já abre a busca
   regLimparFilial(); regRender(); regFocarBusca();
 }
@@ -2250,7 +2253,7 @@ function regBuscar(txt){
   const filtraLista = uf => munLista(uf).filter(m=>m.k.includes(q) && daLista(m)).map(m=>({m, n:nota(m)})).sort((a,b)=>a.n-b.n || a.m.nome.localeCompare(b.m.nome)).slice(0,8).map(x=>x.m);
   let lista = filtraLista(p.uf), html = '';
   if(!lista.length){
-    const outrasLista = ['SP','RJ','MG','CE'].filter(u=>u!==p.uf).map(u=>filtraLista(u)).flat().slice(0,4);
+    const outrasLista = ['SP','RJ'].filter(u=>u!==p.uf).map(u=>filtraLista(u)).flat().slice(0,4);
     if(outrasLista.length){
       box.innerHTML = '<div class="reg-vazio">Nenhuma cidade da lista de filiais de ' + regEsc(p.nome) + ' com "' + regEsc(txt) + '".</div>' + outrasLista.map(m=>{ const pr = filialPraca(regFiliaisDaCidade(m)[0]); return '<button type="button" class="reg-item" onclick="regTrocarPracaCidade(\'' + pr + '\',\'' + m.uf + '\',\'' + regEsc(m.nome).replace(/&#39;/g,"\\'") + '\')"><span>' + regEsc(m.nome) + ' <small>' + m.uf + '</small></span><span class="reg-tag outra">fica em ' + regEsc(PRACAS[pr].nome) + ' · trocar</span></button>'; }).join('');
       box.style.display = 'block'; return;
@@ -2267,7 +2270,7 @@ function regBuscar(txt){
     }).join('');
   } else {
     // a cidade pode ser de outra praça (outro estado)
-    const outras = ['SP','RJ','MG','CE'].filter(u=>u!==p.uf).map(u=>({u, l:filtra(u)})).filter(x=>x.l.length);
+    const outras = ['SP','RJ'].filter(u=>u!==p.uf).map(u=>({u, l:filtra(u)})).filter(x=>x.l.length);
     html = '<div class="reg-vazio">Nenhuma cidade de ' + UF_NOME[p.uf] + ' com "' + regEsc(txt) + '". Confira a grafia.</div>'
       + outras.map(x=>x.l.slice(0,3).map(m=>{ const pr = Object.keys(PRACAS).find(id=>PRACAS[id].uf===m.uf); return '<button type="button" class="reg-item" onclick="regTrocarPracaCidade(\'' + pr + '\',\'' + m.uf + '\',\'' + regEsc(m.nome).replace(/&#39;/g,"\\'") + '\')"><span>' + regEsc(m.nome) + ' <small>' + m.uf + '</small></span><span class="reg-tag outra">fica em ' + regEsc(PRACAS[pr].nome) + ' · trocar</span></button>'; }).join('')).join('');
   }
@@ -2279,7 +2282,7 @@ function regBuscaTecla(e){
 }
 function regTrocarPracaCidade(praca, uf, nome){
   regState.praca = praca;
-  const r = REGIOES_VENDA.find(x=>x.pracas.includes(praca)); if(r) regState.regiao = r.id;
+  const r = REGIOES_SIM.find(x=>x.pracas.includes(praca)); if(r) regState.regiao = r.id;
   regEscolherCidade(uf, nome);
 }
 function regEscolherCidade(uf, nome){
@@ -2294,7 +2297,7 @@ function regUsarFilial(fid){ selectFilial(fid); }
 // filial escolhida direto (atalho ou vinda do Quiz)
 function regFilialDireta(fid){
   regState.filialDireta = fid; regState.cidade = null;
-  const pr = (regState.praca && PRACAS[regState.praca].filiais.includes(fid)) ? regState.praca : filialPraca(fid); if(pr){ regState.praca = pr; const r = REGIOES_VENDA.find(x=>x.pracas.includes(pr)); if(r) regState.regiao = r.id; }
+  const pr = (regState.praca && PRACAS[regState.praca].filiais.includes(fid)) ? regState.praca : filialPraca(fid); if(pr){ regState.praca = pr; const r = REGIOES_SIM.find(x=>x.pracas.includes(pr)); if(r) regState.regiao = r.id; }
   regRender();
 }
 function regCardFilial(fid, extra){
@@ -2304,7 +2307,7 @@ function regCardFilial(fid, extra){
 }
 function regRender(){
   const el = document.getElementById('reg-passo'); if(!el) return;
-  const st = regState, p = st.praca ? PRACAS[st.praca] : null, r = REGIOES_VENDA.find(x=>x.id===st.regiao);
+  const st = regState, p = st.praca ? PRACAS[st.praca] : null, r = REGIOES_SIM.find(x=>x.id===st.regiao);
   let h = '';
   // trilha
   if(r){
@@ -2316,7 +2319,7 @@ function regRender(){
   }
   // 1) regiões
   if(!r){
-    h += '<div class="reg-cards">' + REGIOES_VENDA.map(x=>'<button type="button" class="reg-card" onclick="regEscolherRegiao(\'' + x.id + '\')"><span class="reg-emoji">' + x.emoji + '</span><span class="reg-nome">' + x.nome + '</span><span class="reg-desc">' + x.desc + '</span></button>').join('') + '</div>';
+    h += '<div class="reg-cards">' + REGIOES_SIM.map(x=>'<button type="button" class="reg-card" onclick="regEscolherRegiao(\'' + x.id + '\')"><span class="reg-emoji">' + x.emoji + '</span><span class="reg-nome">' + x.nome + '</span><span class="reg-desc">' + x.desc + '</span></button>').join('') + '</div>';
   }
   // 2) praças da região
   else if(!p){
@@ -3430,7 +3433,7 @@ function montarPDF(o, nivel){
   titulo('Resumo do orçamento');
   tabela({theme:'plain', styles:{font:'helvetica', fontSize:fs, cellPadding:pad, textColor:[34,34,34]},
     columnStyles:{0:{fontStyle:'bold', textColor:AZUL, cellWidth:26}, 2:{fontStyle:'bold', textColor:AZUL, cellWidth:28}},
-    body:[['Filial', o.filial, 'Tabela', o.tabela], ['Carência', o.porte, 'Coparticipação', o.copay==='parcial'?'Parcial':'Total'],
+    body:[...(o.cliente ? [['Cliente', o.cliente, 'Corretora', corretoraDoPDF()]] : []), ['Filial', o.filial, 'Tabela', o.tabela], ['Carência', o.porte, 'Coparticipação', o.copay==='parcial'?'Parcial':'Total'],
           ['Vidas', `${o.totalVidas} (${o.totalTit} titular(es) + ${o.totalDep} dependente(s))`, 'Produtos', String(grupos.length)]].map(r=>r.map(pdfTxt))});
   // Destaque do total
   const linhasTotal = [`Média por vida: ${fmtR(o.totalGeral/o.totalVidas)} · Anual: ${fmtR(o.totalGeral*12)} · ${o.notaTotal ? o.notaTotal : o.pf?'Sem taxa de implantação':'Taxa de implantação: '+fmtR(TAXA_IMPLANTACAO)+' por proposta'}`];
@@ -4317,6 +4320,146 @@ document.addEventListener('DOMContentLoaded', ()=>{
   try{ if(!redeState.grupo) selectRedeGrupo('hapvida'); }catch(e){}   // Rede Própria já selecionada
   vitraAbrir();
 });
+
+// ══════════════════════════════════════════════════════
+// VIVER · ENVIAR O ORÇAMENTO PELO WHATSAPP DO CLIENTE (PDF junto, como link) e API da Carol
+// ══════════════════════════════════════════════════════
+function pdfBlobOrcamento(cliente){
+  const o = ultimoOrcamento; if(!o) return null;
+  o.cliente = cliente || '';
+  if(!(window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API.autoTable)) return null;
+  let doc;
+  for(let nivel=0; nivel<4; nivel++){ doc = montarPDF(o, nivel); if(doc.getNumberOfPages()<=3) break; }
+  const slug = t => String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const nome = 'Cotacao-' + slug(corretoraDoPDF()) + '-Hapvida-' + (cliente ? slug(cliente) + '-' : '') + hojeISO() + '.pdf';
+  return {blob: doc.output('blob'), nome};
+}
+function baixarBlob(blob, nome){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nome; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
+function textoWhatsCliente(cliente, link){
+  const o = ultimoOrcamento, corr = corretoraDoPDF(), v = vendedorProposta();
+  let t = `Olá${cliente ? ', ' + cliente : ''}! 👋\n\nSegue a cotação de plano de saúde da *${corr}*, representante autorizada *Hapvida NotreDame Intermédica*.\n\n`;
+  t += `📍 Filial: ${o.filial}\n📋 Tabela: ${o.tabela}\n⏰ Carência: ${o.porte}\n💊 Coparticipação: ${o.copay==='parcial'?'Parcial':'Total'}\n👥 Vidas: ${o.totalVidas}\n\n`;
+  o.opcoes.forEach(x=>{ t += `• ${x.nome}: *${fmtR(x.total)}*/mês\n`; });
+  if(o.misto) t += `\n💰 *Total do contrato: ${fmtR(o.totalGeral)}/mês*\n`;
+  t += o.pf ? `\nSem taxa de implantação.` : `\nTaxa de implantação: ${fmtR(TAXA_IMPLANTACAO)} por proposta.`;
+  if(o.camp) t += `\n🎯 Campanha: 75% de desconto na 1ª mensalidade (contratos até 30/11/2026).`;
+  t += `\nCotação válida até ${validadeProposta()}.`;
+  t += link ? `\n\n📄 Cotação completa em PDF: ${link}` : `\n\n📄 Envio a cotação completa em PDF logo abaixo.`;
+  t += `\n\nQualquer dúvida, estou à disposição!`;
+  if(v.nome || v.tel) t += `\n${[v.nome, corr].filter(Boolean).join(' · ')}${v.tel ? '\nWhatsApp ' + v.tel : ''}`;
+  return t;
+}
+function waNumero(t){ let d = String(t||'').replace(/\D/g,''); if(d.length===10 || d.length===11) d = '55' + d; return d; }
+// prepara PDF + link + texto e devolve o endereço do WhatsApp do cliente
+async function prepararEnvioWhats(cliente, whats){
+  const num = waNumero(whats);
+  if(num.length < 12 || num.length > 13) throw new Error('Confira o WhatsApp do cliente (DDD + número).');
+  const pdf = pdfBlobOrcamento(cliente);
+  let link = null;
+  if(pdf){ try{ const up = window.parent && window.parent !== window && window.parent.viverSalvarPDF; if(up) link = await up(pdf.blob, pdf.nome); }catch(e){ link = null; } }
+  return {url: 'https://wa.me/' + num + '?text=' + encodeURIComponent(textoWhatsCliente(cliente, link)), pdf, link};
+}
+function abrirEnvioWhats(){
+  if(!ultimoOrcamento) return;
+  let m = document.getElementById('wa-cli-modal');
+  if(!m){
+    m = document.createElement('div'); m.id = 'wa-cli-modal';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(10,30,60,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+    m.innerHTML = `<form id="wa-cli-form" style="background:#fff;border-radius:16px;padding:22px;width:min(420px,100%);box-shadow:0 20px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:17px;color:var(--primary-dark)">💬 Enviar cotação pelo WhatsApp</h3><button type="button" id="wa-cli-x" style="border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)" aria-label="Fechar">✕</button></div>
+      <p style="margin:0;font-size:12px;color:var(--muted)">A mensagem vai pronta, em nome da <b id="wa-cli-corr"></b>, com o PDF da cotação.</p>
+      <div class="form-group" style="margin:0"><label class="form-label" for="wa-cli-num">WhatsApp do cliente</label><input class="form-control" id="wa-cli-num" inputmode="tel" placeholder="(11) 99999-9999" autocomplete="off"></div>
+      <div class="form-group" style="margin:0"><label class="form-label" for="wa-cli-nome">Nome ou empresa do cliente</label><input class="form-control" id="wa-cli-nome" placeholder="Ex.: Maria Souza ou Padaria Bom Pão" autocomplete="off"></div>
+      <div id="wa-cli-err" style="font-size:12px;color:#c0392b;font-weight:700"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-success" type="submit" id="wa-cli-ok" style="background:#25D366;border-color:#25D366;color:#fff">Abrir WhatsApp do cliente</button><button class="btn btn-secondary" type="button" id="wa-cli-cancel">Cancelar</button></div>
+      <p style="margin:0;font-size:11px;color:var(--muted)">O WhatsApp abre na conversa do cliente com o texto e o link do PDF; é só tocar em enviar.</p></form>`;
+    document.body.appendChild(m);
+    const fechar = ()=>{ m.style.display = 'none'; };
+    m.querySelector('#wa-cli-x').onclick = fechar; m.querySelector('#wa-cli-cancel').onclick = fechar;
+    m.addEventListener('click', e=>{ if(e.target === m) fechar(); });
+    m.querySelector('#wa-cli-form').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const err = m.querySelector('#wa-cli-err'), btn = m.querySelector('#wa-cli-ok');
+      const nome = m.querySelector('#wa-cli-nome').value.trim(), num = m.querySelector('#wa-cli-num').value.trim();
+      if(waNumero(num).length < 12){ err.textContent = 'Digite o WhatsApp do cliente com DDD.'; return; }
+      if(!nome){ err.textContent = 'Digite o nome ou a empresa do cliente.'; return; }
+      err.textContent = ''; btn.disabled = true; btn.textContent = 'Preparando a cotação…';
+      const w = window.open('', '_blank');   // abre já, para o navegador não bloquear
+      try{
+        const r = await prepararEnvioWhats(nome, num);
+        if(r.pdf && !r.link) baixarBlob(r.pdf.blob, r.pdf.nome);   // sem link: baixa o PDF para anexar na conversa
+        if(w) w.location.href = r.url; else window.location.href = r.url;
+        fechar();
+      }catch(ex){ if(w) w.close(); err.textContent = ex.message; }
+      btn.disabled = false; btn.textContent = 'Abrir WhatsApp do cliente';
+    });
+  }
+  m.querySelector('#wa-cli-corr').textContent = corretoraDoPDF();
+  m.querySelector('#wa-cli-err').textContent = '';
+  m.style.display = 'flex';
+  setTimeout(()=>m.querySelector('#wa-cli-num').focus(), 50);
+}
+
+// ── API da Carol: catálogo de produtos e cotação sem precisar clicar no simulador ──
+const CAROL_PRACAS = ['saopaulo','riodejaneiro'];
+function idadeFaixa(a){ a = Math.max(0, Math.floor(+a||0)); if(a<=18) return 0; if(a>=59) return 9; return Math.floor((a-19)/5)+1; }
+function filiaisViver(){ return [...new Set(CAROL_PRACAS.flatMap(p=>PRACAS[p].filiais))].filter(filialTemTabela); }
+window.viverCatalogo = function(){
+  const fs = filiaisViver(), linhas = [];
+  linhas.push('Filiais (praças São Paulo e Rio de Janeiro): ' + fs.map(f=>f + ' = ' + filialInfo(f).name + ' (' + (filialInfo(f).area||'') + ')').join('; '));
+  linhas.push('Tabelas: pf = Pessoa Física (1 titular + dependentes, um só produto); ss1 = Super Simples 1 vida (sócio do CNPJ); naomei = Super Simples 2 a 29 vidas Demais Empresas; mei = Super Simples 2 a 29 vidas MEI; pme_comp = PME 30 a 99 vidas Compulsório; pme_livre = PME 30 a 99 vidas Livre Adesão.');
+  linhas.push('Coparticipação: parcial ou total. Acomodação: enf (enfermaria), apt (apartamento), amb (ambulatorial).');
+  Object.keys(TABELA_LABEL).forEach(tab=>{
+    const porProd = {};
+    fs.forEach(f=>{ const t = tabelaFilial(tab, f); if(!t) return; Object.keys(t).forEach(k=>{ const [p,a,c,r] = k.split('|'); const id = p + (r && r!=='-' ? ' reembolso ' + r : ''); (porProd[id] = porProd[id] || {p, r, ac:new Set(), fs:new Set()}); porProd[id].ac.add(a); porProd[id].fs.add(f); }); });
+    const ids = Object.keys(porProd); if(!ids.length) return;
+    linhas.push('Tabela ' + tab + ': ' + ids.map(id=>{ const x = porProd[id]; return (PRODUTO_INFO[x.p]||{nome:x.p}).nome + ' [produto=' + x.p + (x.r && x.r!=='-' ? ', reembolso=' + x.r : '') + '] acomodação ' + [...x.ac].join('/') + (x.fs.size < fs.length ? ' · só em: ' + [...x.fs].join(', ') : ''); }).join('; '));
+  });
+  return linhas.join('\n');
+};
+function acharFilial(p){
+  if(p.filial && filialTemTabela(p.filial)) return {f:p.filial};
+  const nome = String(p.cidade||'').trim(); if(!nome) return {erro:'Informe a cidade do cliente (ou a filial).'};
+  for(const uf of ['SP','RJ']){ const m = munAchar(uf, nome); if(m){ const fs = regFiliaisDaCidade(m).filter(filialTemTabela); if(fs.length) return {f:fs[0], cidade:m.nome};
+      const prox = regMaisProximas(m).filter(t=>t.km<=REG_MAX_KM); return {erro: m.nome + ' não está na área de vendas de nenhuma filial.' + (prox.length ? ' A cidade com tabela mais próxima é ' + prox[0].m.nome + ' (filial ' + filialInfo(prox[0].filial).name + ', ~' + Math.round(prox[0].km) + ' km).' : '')}; } }
+  return {erro:'Não achei a cidade "' + nome + '" em São Paulo ou no Rio de Janeiro.'};
+}
+function acharProduto(txt){
+  const n = regNorm(txt); if(!n) return null;
+  if(PRODUTO_INFO[txt]) return txt;
+  const ids = Object.keys(PRODUTO_INFO);
+  return ids.find(id=>regNorm(PRODUTO_INFO[id].nome)===n) || ids.find(id=>regNorm(PRODUTO_INFO[id].nome).includes(n) || n.includes(regNorm(PRODUTO_INFO[id].nome))) || null;
+}
+// p = {cidade|filial, tabela, copay, produto, acomod, reembolso, titulares:[idades], dependentes:[idades]}
+window.viverCotar = function(p){
+  try{
+    p = p || {};
+    const fil = acharFilial(p); if(fil.erro) return {erro:fil.erro};
+    const tab = String(p.tabela||'').trim(); if(!TABELA_LABEL[tab]) return {erro:'Tabela inválida. Use pf, ss1, naomei, mei, pme_comp ou pme_livre.'};
+    if(!tabelaFilial(tab, fil.f)) return {erro:'A filial ' + filialInfo(fil.f).name + ' não tem a tabela ' + TABELA_LABEL[tab] + '.'};
+    const copay = p.copay==='total' ? 'total' : 'parcial';
+    const prod = acharProduto(p.produto); if(!prod) return {erro:'Não encontrei o produto "' + (p.produto||'') + '".'};
+    const ops = opcoesDisponiveis(tab, fil.f, copay).filter(o=>o.produto===prod);
+    if(!ops.length) return {erro:(PRODUTO_INFO[prod]||{nome:prod}).nome + ' não está disponível em ' + filialInfo(fil.f).name + ' na tabela ' + TABELA_LABEL[tab] + ' com coparticipação ' + copay + '. Disponíveis: ' + [...new Set(opcoesDisponiveis(tab, fil.f, copay).map(o=>(PRODUTO_INFO[o.produto]||{nome:o.produto}).nome))].join(', ') + '.'};
+    const ac = ops.find(o=>o.acomod===(p.acomod||'') && (!p.reembolso || o.reembolso===p.reembolso)) || ops.find(o=>o.acomod===(p.acomod||'')) || ops.find(o=>o.acomod==='enf') || ops[0];
+    const tit = (p.titulares||[]).map(Number).filter(x=>!isNaN(x)), dep = (p.dependentes||[]).map(Number).filter(x=>!isNaN(x));
+    if(!tit.length) return {erro:'Informe a idade de pelo menos 1 titular.'};
+    const m = {tit:Array(10).fill(0), dep:Array(10).fill(0)};
+    tit.forEach(a=>m.tit[idadeFaixa(a)]++); dep.forEach(a=>m.dep[idadeFaixa(a)]++);
+    // monta a simulação como se o corretor tivesse clicado
+    regState = {regiao:'sudeste', praca:filialPraca(fil.f), cidade:fil.cidade ? munAchar(filialUF(fil.f), fil.cidade) : null, filialDireta:fil.cidade ? null : fil.f};
+    simState.filial = fil.f; simState.somenteAmb = false; simState.tabela = tab; simState.copay = copay;
+    simState.contrato = tab==='pf' ? 'pf' : tab==='ss1' ? 'ss1' : (tab==='pme_comp'||tab==='pme_livre') ? 'pme' : (tit.length+dep.length<=15 ? 'ss2_15' : 'ss16_29');
+    simState.mix = {}; simState.mix[ac.key] = m;
+    let aviso = null; const alertaOrig = window.alert; window.alert = t=>{ aviso = t; };
+    try{ calcular(); } finally { window.alert = alertaOrig; }
+    if(aviso) return {erro:aviso};
+    const o = ultimoOrcamento;
+    return {ok:true, filial:o.filial, tabela:o.tabela, carencia:o.porte, copay:o.copay, vidas:o.totalVidas, produto:ac.key, nome:(o.opcoes[0]||{}).nome, total:o.totalGeral, totalFmt:fmtR(o.totalGeral), camp:!!o.camp, pf:!!o.pf, validade:validadeProposta(), texto:textoOrcamento().replace(/\*/g,'')};
+  }catch(e){ return {erro:'Não consegui montar a cotação: ' + e.message}; }
+};
+window.viverPDFBaixar = function(cliente){ const r = pdfBlobOrcamento(cliente); if(!r) { gerarPDF(); return true; } baixarBlob(r.blob, r.nome); return true; };
+window.viverPrepararWhats = prepararEnvioWhats;
 </script>
 
 <!-- ══════════════════════════════════════════════════════ -->

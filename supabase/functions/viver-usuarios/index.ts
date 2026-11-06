@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
 
   if (acao === "listar") {
     const { data, error } = await adm.from("perfis")
-      .select("id,email,login,nome,papel,status,corretora_id,criado_em,criado_por,corretoras(nome)")
+      .select("id,email,login,nome,papel,status,telefone,corretora_id,criado_em,criado_por,corretoras(nome)")
       .order("papel").order("nome");
     if (error) return resp({ erro: error.message }, 500);
     return resp({ itens: data });
@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
   if (acao === "criar") {
     const acesso = String(b.email || b.login || "").trim().toLowerCase();
     const nome = String(b.nome || "").trim();
+    const telefone = String(b.telefone || "").replace(/\D/g, "") || null;
     const papel = PAPEIS.includes(b.papel) ? b.papel : "corretor";
     const corretora_id = papel === "corretor" && b.corretora_id ? Number(b.corretora_id) : null;
     // e-mail ou usuário (nome.sobrenome)
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
     const senha = String(b.senha || "").length >= 8 ? String(b.senha) : senhaTemporaria();
     const { data: novo, error } = await adm.auth.admin.createUser({ email, password: senha, email_confirm: true, user_metadata: { nome } });
     if (error) return resp({ erro: /already|registered|exists/i.test(error.message) ? "Este e-mail ou usuário já tem acesso ao portal." : error.message }, 400);
-    const { error: ep } = await adm.from("perfis").insert({ id: novo.user!.id, email, login, nome, papel, corretora_id, criado_por: eu2.email });
+    const { error: ep } = await adm.from("perfis").insert({ id: novo.user!.id, email, login, nome, papel, telefone, corretora_id, criado_por: eu2.email });
     if (ep) { await adm.auth.admin.deleteUser(novo.user!.id); return resp({ erro: ep.message }, 500); }
     await log("criar_usuario", email, { papel, corretora_id });
     return resp({ ok: true, id: novo.user!.id, senha, acesso: login || email });
@@ -71,6 +72,14 @@ Deno.serve(async (req) => {
   if (!id) return resp({ erro: "Usuário não informado." }, 400);
   const { data: alvo } = await adm.from("perfis").select("id,email,papel,status").eq("id", id).maybeSingle();
   if (!alvo) return resp({ erro: "Usuário não encontrado." }, 404);
+  if (acao === "telefone") {
+    const telefone = String(b.telefone || "").replace(/\D/g, "");
+    if (telefone && (telefone.length < 10 || telefone.length > 13)) return resp({ erro: "Confira o WhatsApp (DDD + número)." }, 400);
+    const { error } = await adm.from("perfis").update({ telefone: telefone || null }).eq("id", id);
+    if (error) return resp({ erro: error.message }, 500);
+    await log("telefone_usuario", alvo.email);
+    return resp({ ok: true });
+  }
   if (alvo.id === eu2.id && acao !== "nova_senha" && acao !== "senha") return resp({ erro: "Você não pode pausar ou excluir o seu próprio acesso." }, 400);
 
   if (acao === "pausar" || acao === "reativar") {

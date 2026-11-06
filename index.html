@@ -326,6 +326,16 @@ td .sm{color:var(--muted);font-size:.76rem}
 .cr-boas{margin:auto;text-align:center;max-width:560px;color:var(--muted);font-size:.88rem}
 .cr-boas .cr-av{margin:0 auto;width:58px;height:58px;font-size:1.5rem}
 .cr-av{overflow:hidden;padding:0}.cr-av svg{display:block;width:100%;height:100%}
+.cr-cot{background:var(--surface);border:1.5px solid color-mix(in srgb,var(--brand) 45%,var(--line));border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:5px;max-width:420px;box-shadow:var(--shadow)}
+.cr-cot+.cr-cot{margin-top:8px}
+.cr-cot-h{font-weight:700;font-size:.8rem;color:var(--brand-strong)}
+.cr-cot-l{font-size:.8rem;line-height:1.4}
+.cr-cot-t{font-family:var(--f-display);font-weight:800;font-size:1.5rem;color:var(--fg)}
+.cr-cot-t small{font-size:.8rem;font-weight:600;color:var(--muted);margin-left:2px}
+.cr-cot-b{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.cr-cot-b button,.cr-cot-b a{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:7px 12px;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;text-decoration:none}
+.cr-cot-b button:hover{border-color:var(--brand)}
+.cr-cot-b .wa{background:#25D366;border-color:#25D366;color:#fff}
 .cr-boas h3{color:var(--fg);font-size:1.1rem;margin:12px 0 6px}
 .cr-sug{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
 .cr-sug button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:7px 12px;font-size:.78rem}
@@ -684,6 +694,7 @@ function renderNav(){
   const nm = role==="gestor" ? USER.nome+" · Gestor" : (USER.perfil==="gestor" ? "Vendo como "+byId(ME).nome : byId(ME).nome);
   $("#whoName").textContent = nm; $("#whoAv").textContent = role==="gestor"?ini(USER.nome):ini(byId(ME).nome);
   window.VIVER_CORRETORA = role==="corretor" ? byId(ME).corr : "Viver Assessoria";
+  window.VIVER_TELEFONE = role==="corretor" ? (byId(ME).tel||"") : ((USER&&USER.tel)||"");
   window.VIVER_GESTOR = !!USER && USER.perfil==="gestor";
   agendarPreFinanceiro();
   const fab=$("#fab"); fab.hidden = role!=="corretor"; document.body.classList.toggle("com-fab", role==="corretor");
@@ -717,11 +728,13 @@ function go(p){if(p==="financeiro")return abrirFinanceiro();if(p==="simulador")r
 // SIMULADOR DE PREÇOS — abre simulador.html dentro do painel (o simulador não usa login nem dados do painel)
 const SIM_SUB=[["simulador","Simulador"],["regras","Regras"],["rede","Rede de Atendimento"],["ferramentas","Ferramentas"]];
 let simSec="simulador";
+// nome da corretora, do consultor e WhatsApp dele: vão para o PDF e para a mensagem do orçamento
+function identSimulador(){ return new URLSearchParams({corretora:window.VIVER_CORRETORA, vn: role==="corretor"?byId(ME).nome:USER.nome, vt: window.VIVER_TELEFONE||""}).toString(); }
 function abrirSimulador(secao){
   page="simulador"; simSec=secao; render(); window.scrollTo({top:0}); closeSide();
   const f=$("#sim-frame");
   // nome do consultor e da corretora vão para o PDF do orçamento; se mudar quem está logado, recarrega
-  const ident=new URLSearchParams({corretora:window.VIVER_CORRETORA, vn: role==="corretor"?byId(ME).nome:USER.nome}).toString();
+  const ident=identSimulador();
   if(f.dataset.ident!==ident){ f.src="simulador.html?"+ident+"#"+secao; f.dataset.ident=ident; }
   else { try{ f.contentWindow.location.hash=secao; }catch(e){ f.src="simulador.html?"+ident+"#"+secao; } }
 }
@@ -889,7 +902,7 @@ function crDados(){
     +"\n\nPedidos em aberto:\n"+(PED.filter(p=>!["concluído","entregue"].includes(p.st)).map(p=>"- "+byId(p.c).nome+": "+p.assunto+" ("+p.tipo+", "+p.data+", "+p.st+")").join("\n")||"nenhum")
     +"\n\nEsteira de vínculos em andamento:\n"+(at.join("\n")||"nenhum processo");
 }
-function crInstrucoes(regras, saudar){
+function crInstrucoes(regras, saudar, catalogo){
   const gestor = USER && USER.perfil==="gestor", nome=(USER&&USER.nome)||"", primeiro=nome.split(" ")[0];
   const hoje=new Date().toLocaleDateString("pt-BR");
   return `Você é a Carol, assistente da Viver Assessoria dentro do portal do corretor parceiro. Você ajuda ${gestor?"a gestão da Viver e os corretores":"os corretores parceiros"} com dúvidas sobre o sistema (o portal), vendas e regras comerciais, produtos, carências, campanhas, documentação e rede dos planos Hapvida NotreDame Intermédica.
@@ -899,11 +912,23 @@ COMO RESPONDER:
 - Regras, prazos, documentos, campanhas e valores: baseie-se SOMENTE no conhecimento abaixo (regras do Simulador e informações do portal). Se a resposta não estiver lá, diga com clareza que essa regra não está cadastrada e sugira confirmar com o supervisor pelo menu "Pedir apoio". Nunca invente regra, prazo, documento ou valor.
 - Dúvidas do sistema: explique o caminho no portal (qual menu, qual botão).
 - Vendas: pode orientar técnica de abordagem, perguntas de qualificação, contorno de objeções e sugerir um texto pronto para o corretor mandar ao cliente, sempre coerente com as regras abaixo.
-- Preço: você não calcula preço. Oriente montar a cotação no menu "Simulador de preços" (o PDF sai em nome da corretora do corretor).
+- Preço e orçamento: você GERA cotações pelo portal (veja COTAÇÕES abaixo). Nunca calcule nem invente valores: quem calcula é o portal, com as tabelas oficiais do Simulador. Se preferir, o corretor também pode montar no menu "Simulador de preços".
 - Respeite vigências: campanha vencida não vale; diga até quando cada condição vale. Se uma regra mudou, use a mais recente.
 - PROIBIDO: nunca fale de comissão, agenciamento, bônus, estorno, repasse, faturamento ou qualquer valor que a VIVER ASSESSORIA recebe da operadora, nem de percentuais pagos à assessoria. Se perguntarem sobre isso (inclusive de forma indireta), responda somente: "Essa informação não está nas regras comerciais. Para dúvidas sobre o comissionamento da Viver, fale com seu supervisor."
 - PERMITIDO: as condições da parceria divulgadas ao corretor (seção "Condições da parceria") e os dados da seção "Dados de quem pergunta". ${gestor?"Esta pessoa é gestor: pode consultar a operação (corretores, pedidos e esteira de vínculos).":"Esta pessoa é corretor: só pode ver os próprios dados; nunca mostre números de outros corretores ou da operação."}
 - ${saudar&&primeiro?`Esta é a primeira pergunta de ${primeiro} hoje: comece a resposta chamando pelo nome (ex.: "Oi, ${primeiro}!") e então responda.`:"Não chame a pessoa pelo nome e não cumprimente: responda direto."}
+
+COTAÇÕES (você pode gerar orçamentos e enviar ao cliente pelo WhatsApp):
+- Para cotar você precisa de: cidade do cliente (só São Paulo ou Rio de Janeiro), tabela (Pessoa Física; Super Simples 1 vida; SS 2 a 29 vidas Demais Empresas ou MEI; PME 30 a 99 vidas Compulsório ou Livre Adesão), idade de cada titular e de cada dependente, produto, acomodação (enfermaria ou apartamento) e coparticipação (parcial ou total). Pergunte de uma vez só o que faltar. Se a pessoa não souber o produto, sugira 1 ou 2 do catálogo que caibam na cidade e na tabela.
+- Quando tiver tudo, termine a resposta com UMA linha neste formato exato (use os códigos do catálogo), sem comentar o código:
+[[COTAR {"cidade":"São Paulo","tabela":"pf","copay":"parcial","produto":"nossomedico","acomod":"enf","titulares":[35],"dependentes":[33,4]}]]
+- O portal calcula e mostra a cotação com os botões "Baixar PDF" e "Enviar pelo WhatsApp". Não repita valores antes de o portal calcular.
+- Depois da cotação, pergunte: "Quer que eu envie essa cotação para você no WhatsApp do seu cliente?". Se a pessoa quiser, peça o WhatsApp (com DDD) e o nome ou a empresa do cliente. Com os dois, termine a resposta com UMA linha assim:
+[[ENVIAR {"whats":"11999998888","cliente":"Maria Souza"}]]
+- A mensagem ao cliente sai em nome da corretora, como representante autorizada Hapvida NotreDame Intermédica, com o PDF da cotação. O corretor só confirma o envio no WhatsApp.
+- Mensagens que começam com "Sistema:" vêm do portal (resultado ou erro da cotação). Se houver erro, explique em poucas palavras e corrija os dados.
+CATÁLOGO DE COTAÇÃO (filiais, tabelas e produtos de São Paulo e Rio de Janeiro):
+${catalogo||"(catálogo indisponível agora: peça os dados e oriente usar o menu Simulador de preços)"}
 
 CONHECIMENTO — PORTAL VIVER:
 ${crPortal()}
@@ -921,7 +946,8 @@ async function crSample(){
 const CR_ERROS = {not_granted:"Para a Carol responder, permita que o portal use o Claude quando o aviso aparecer.",sampling_disabled:"A Carol não está disponível para esta conta.",rate_limited:"Muitas perguntas seguidas. Espere um pouco e tente de novo.",session_expired:"Sua sessão no Claude expirou. Entre de novo e tente outra vez.",refused:"A Carol não pôde responder essa pergunta. Tente perguntar de outro jeito.",prompt_too_large:"A conversa ficou longa demais. Comece uma nova conversa."};
 async function crPerguntarIA(pergunta, contexto, saudar, onText, signal){
   const regras = await crRegras();
-  const inst = crInstrucoes(regras, saudar);
+  let catalogo = ""; try{ const sim = await crSim(); catalogo = sim.viverCatalogo(); }catch(e){}
+  const inst = crInstrucoes(regras, saudar, catalogo);
   const turns=[{role:"user",content:inst}];
   contexto.forEach(t=>{ turns.push({role:"user",content:t.p}); turns.push({role:"assistant",content:t.r}); });
   turns.push({role:"user",content:pergunta});
@@ -930,12 +956,66 @@ async function crPerguntarIA(pergunta, contexto, saudar, onText, signal){
     try{ const r = await sample(turns,{cache:false, signal, onText:({text})=>onText(text)}); return r.text; }
     catch(e){ const err=new Error(CR_ERROS[e&&e.code]||"A Carol não conseguiu responder agora. Tente de novo."); err.code=e&&e.code; err.parcial=e&&e.text; throw err; }
   }
+  if(window.viverCarolIA){ const t = await window.viverCarolIA(turns, signal); onText(t); return t; }   // site: função "carol" no Supabase
   if(CAROL_API){
     const r = await fetch(CAROL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mensagens:turns}),signal});
     const j = await r.json().catch(()=>({})); if(!r.ok||!j.resposta) throw new Error(j.erro||"A Carol não conseguiu responder agora.");
     onText(j.resposta); return j.resposta;
   }
   throw new Error("A Carol responde pelo link do portal Viver no Claude. Nesta cópia hospedada ela ainda não está ligada a uma IA.");
+}
+// ── cotação pela Carol: usa o motor do Simulador (mesmas tabelas, mesmo PDF) ──
+function crSim(){
+  return new Promise((ok, falha)=>{
+    const f=$("#sim-frame"); if(!f) return falha(new Error("Simulador indisponível."));
+    const pronto=()=>{ try{ const w=f.contentWindow; if(w && w.viverCotar && w.viverCatalogo) return w; }catch(e){} return null; };
+    const w=pronto(); const ident=identSimulador();
+    if(w && f.dataset.ident===ident) return ok(w);
+    let n=0; const espera=()=>{ const w2=pronto(); if(w2) return ok(w2); if(++n>150) return falha(new Error("O Simulador demorou para abrir.")); setTimeout(espera,100); };
+    if(f.dataset.ident!==ident){ f.src="simulador.html?"+ident+"#simulador"; f.dataset.ident=ident; setTimeout(espera,300); } else espera();
+  });
+}
+const CR_BLOCO = /\[\[(COTAR|ENVIAR)\s*(\{[\s\S]*?\})\s*\]\]/g;
+async function crAcoes(turno){
+  const blocos=[...String(turno.r||"").matchAll(CR_BLOCO)]; if(!blocos.length) return;
+  turno.r=String(turno.r).replace(CR_BLOCO,"").trim();
+  const notas=[];
+  for(const b of blocos){
+    let dados={}; try{ dados=JSON.parse(b[2]); }catch(e){ notas.push("Sistema: não entendi os dados da "+(b[1]==="COTAR"?"cotação":"mensagem")+"."); continue; }
+    try{
+      const sim=await crSim();
+      if(b[1]==="COTAR"){
+        const res=sim.viverCotar(dados);
+        if(res.erro){ turno.cotErro=res.erro; notas.push("Sistema: a cotação não foi gerada: "+res.erro); continue; }
+        CR.cotacao={params:dados, res}; turno.cot=res; turno.cotParams=dados;
+        notas.push("Sistema: cotação gerada — "+res.nome+" · "+res.filial+" · "+res.vidas+" vida(s) · total "+res.totalFmt+"/mês.");
+        if(!/whats/i.test(turno.r)) turno.r=(turno.r?turno.r+"\n\n":"")+"Quer que eu envie essa cotação para você no WhatsApp do seu cliente?";
+      } else {
+        if(!CR.cotacao){ notas.push("Sistema: ainda não há cotação nesta conversa para enviar."); turno.cotErro="Primeiro preciso gerar a cotação."; continue; }
+        const re=sim.viverCotar(CR.cotacao.params); if(re.erro) throw new Error(re.erro);   // garante que o PDF é desta cotação
+        const env=await sim.viverPrepararWhats(String(dados.cliente||"").trim(), String(dados.whats||""));
+        turno.envio={url:env.url, cliente:String(dados.cliente||"").trim(), whats:String(dados.whats||""), semLink:!env.link, temPdf:!!env.pdf};
+        notas.push("Sistema: mensagem pronta para "+(turno.envio.cliente||"o cliente")+" no WhatsApp, com o PDF.");
+      }
+    }catch(e){ turno.cotErro=e.message; notas.push("Sistema: "+e.message); }
+  }
+  turno.ctx=(turno.r?turno.r+"\n\n":"")+notas.join("\n");
+}
+function crCardCotacao(t,k){
+  const c=t.cot; if(!c) return "";
+  return '<div class="cr-cot"><div class="cr-cot-h">📋 Cotação Hapvida NotreDame · '+crEsc(c.filial)+'</div>'
+    +'<div class="cr-cot-l"><b>'+crEsc(c.nome)+'</b></div>'
+    +'<div class="cr-cot-l">'+crEsc(c.tabela)+' · Coparticipação '+(c.copay==="parcial"?"parcial":"total")+' · '+c.vidas+' vida(s)</div>'
+    +'<div class="cr-cot-t">'+crEsc(c.totalFmt)+'<small>/mês</small></div>'
+    +'<div class="cr-cot-l" style="opacity:.8">'+(c.pf?"Sem taxa de implantação":"Taxa de implantação por proposta")+(c.camp?" · Campanha: 75% off na 1ª mensalidade":"")+' · válida até '+crEsc(c.validade)+'</div>'
+    +'<div class="cr-cot-b"><button type="button" data-crpdf="'+k+'">Baixar PDF</button><button type="button" class="wa" data-crwa="'+k+'">Enviar pelo WhatsApp</button></div></div>';
+}
+function crCardEnvio(t){
+  const e=t.envio; if(!e) return "";
+  return '<div class="cr-cot"><div class="cr-cot-h">💬 Pronto para enviar'+(e.cliente?' para '+crEsc(e.cliente):'')+'</div>'
+    +'<div class="cr-cot-l">A mensagem já está escrita em nome da '+crEsc(window.VIVER_CORRETORA||"corretora")+', representante autorizada Hapvida NotreDame Intermédica, '+(e.semLink?'e o PDF vai ser baixado para você anexar na conversa.':'com o link do PDF da cotação.')+'</div>'
+    +'<div class="cr-cot-b"><a class="wa" href="'+crEsc(e.url)+'" target="_blank" rel="noopener" data-crabrir="'+(e.semLink?'1':'')+'">Abrir WhatsApp '+(e.cliente?'de '+crEsc(e.cliente.split(" ")[0]):'do cliente')+'</a></div>'
+    +'<div class="cr-cot-l" style="opacity:.75;font-size:.72rem">É só tocar em enviar no WhatsApp.</div></div>';
 }
 // ── tela ──
 function carolAbrir(){
@@ -977,6 +1057,8 @@ function carolRenderConversa(pensando){
   CR.conversa.forEach((t,k)=>{
     h+='<div class="cr-m eu">'+(t.audio?'<span class="cr-aud">🎤</span>':"")+crEsc(t.p)+'</div>';
     if(t.r) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-m ela">'+crFmt(t.r)+(t.parcial?"":'<div class="cr-acoes"><button type="button" data-crcopiar="'+k+'">Copiar resposta</button></div>')+'</div></div>';
+    if(t.cot||t.envio) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div>'+crCardCotacao(t,k)+crCardEnvio(t)+'</div></div>';
+    if(t.cotErro) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-m ela erro">'+crEsc(t.cotErro)+'</div></div>';
     if(t.erro) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-m ela erro">'+crEsc(t.erro)+'</div></div>';
   });
   if(pensando) h+='<div class="cr-linha"><div class="cr-av">'+CR_AV+'</div><div class="cr-pensando"><i></i><i></i><i></i> Carol está consultando as regras…</div></div>';
@@ -990,14 +1072,15 @@ async function carolEnviar(viaAudio){
   const el=$("#cr-txt"); if(!el) return; const p=el.value.trim(); if(!p) return;
   if(CR.ouvindo) carolPararMic(true);
   el.value=""; carolAltura(el);
-  const contexto=CR.conversa.filter(t=>t.r&&!t.parcial).slice(-6).map(t=>({p:t.p,r:t.r}));
+  const contexto=CR.conversa.filter(t=>t.r&&!t.parcial).slice(-8).map(t=>({p:t.p,r:t.ctx||t.r}));
   const turno={p, audio:!!viaAudio}; CR.conversa.push(turno);
   let saudar=false; try{ const k="viverCarolDia:"+USER.email; saudar = localStorage.getItem(k)!==crHojeISO(); localStorage.setItem(k,crHojeISO()); }catch(e){ saudar = !CR.itens.some(i=>String(i.criado_em).slice(0,10)===new Date().toISOString().slice(0,10)); }
   CR.ocupado=true; CR.ctl=new AbortController(); carolBotao(); carolRenderConversa(true);
   try{
-    const r = await crPerguntarIA(p, contexto, saudar, txt=>{ turno.r=txt; turno.parcial=true; if(page==="carol") carolRenderConversa(); }, CR.ctl.signal);
+    const r = await crPerguntarIA(p, contexto, saudar, txt=>{ turno.r=String(txt).replace(/\[\[(COTAR|ENVIAR)[\s\S]*$/,"").trim(); turno.parcial=true; if(page==="carol") carolRenderConversa(); }, CR.ctl.signal);
     turno.r=r; turno.parcial=false;
-    const item={id:Date.now(), pergunta:p, resposta:r, criado_em:new Date().toISOString(), via_audio:!!viaAudio};
+    await crAcoes(turno);
+    const item={id:Date.now(), pergunta:p, resposta:turno.r, criado_em:new Date().toISOString(), via_audio:!!viaAudio};
     CR.itens.unshift(item); crGravar(); carolRenderHist();
   }catch(e){
     if(e && e.name==="AbortError"){ turno.parcial=false; if(!turno.r) turno.erro="Resposta interrompida."; }
@@ -1281,6 +1364,11 @@ const AFTER = {
     $("#cr-hist-lista").onclick=e=>{ const b=e.target.closest("[data-crid]"); if(b) carolReabrir(+b.dataset.crid); };
     $("#cr-msgs").onclick=e=>{
       const s=e.target.closest("[data-crsug]"); if(s){ t.value=s.textContent; carolEnviar(); return; }
+      const pd=e.target.closest("[data-crpdf]"); if(pd){ const tt=CR.conversa[+pd.dataset.crpdf]; if(!tt||!tt.cot) return; pd.disabled=true;
+        crSim().then(sim=>{ const r=sim.viverCotar(tt.cotParams); if(r.erro) throw new Error(r.erro); sim.viverPDFBaixar(""); toast("PDF da cotação baixado"); })
+          .catch(err=>toast(err.message)).finally(()=>{ pd.disabled=false; }); return; }
+      const wa=e.target.closest("[data-crwa]"); if(wa){ if(CR.ocupado) return; t.value="Quero enviar essa cotação no WhatsApp do meu cliente."; carolEnviar(); return; }
+      const ab=e.target.closest("[data-crabrir]"); if(ab && ab.dataset.crabrir==="1"){ crSim().then(sim=>sim.viverPDFBaixar((CR.conversa.find(x=>x.envio&&x.envio.url===ab.getAttribute("href"))||{envio:{}}).envio.cliente||"")).catch(()=>{}); }
       const c=e.target.closest("[data-crcopiar]"); if(c){ const tt=CR.conversa[+c.dataset.crcopiar]; if(!tt) return;
         const txt=String(tt.r).replace(/\*\*?([^*\n]+)\*\*?/g,"$1");
         const ok=()=>{ c.textContent="Copiado ✓"; setTimeout(()=>{ c.textContent="Copiar resposta"; },1500); }, falhou=()=>toast("Não deu para copiar. Selecione o texto e copie.");

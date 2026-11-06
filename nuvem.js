@@ -31,6 +31,7 @@ const soDig = s=>String(s||"").replace(/\D/g,"");
 const fmtCnpj = s=>{ const d=soDig(s); return d.length===14 ? d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,"$1.$2.$3/$4-$5") : (s||""); };
 const fmtTel = s=>{ const d=soDig(s); return d.length===11?d.replace(/^(\d{2})(\d{5})(\d{4})$/,"($1) $2-$3"):d.length===10?d.replace(/^(\d{2})(\d{4})(\d{4})$/,"($1) $2-$3"):(s||""); };
 const pctGrade = g=>{ const m=String(g||"").match(/(\d+(?:[.,]\d+)?)\s*%/); return m?parseFloat(m[1].replace(",",".")):null; };
+const WHATS_VIVER = "11995588188";   // comercial da Viver: vale para gestores sem WhatsApp cadastrado
 const COM_QUEM = {viver:"Viver", corretor:"Corretor", hapvida:"Hapvida", concluido:"Concluído", declinado:"Declinado"};
 const ETAPA_DE = {corretor:0, viver:1, hapvida:3, concluido:4, declinado:0};
 const respNome = c=>{ const r=(c.responsaveis||[])[0]; return (r&&r.nome) || (c.contato&&c.contato!=="CONCLUÍDO"&&c.contato!=="AGENDAR"?String(c.contato).split(" - ")[0]:"") || "Responsável não informado"; };
@@ -117,7 +118,7 @@ async function carregar(){
     const detalhe = c.pendencia || c.situacao || a.t;
     C.push({id:c.id, nome: papel()==="corretor"?N.perfil.nome:respNome(c), corr:c.nome, desde:fmtData(c.abertura||c.criado_em),
       etapa: c.com_quem==="concluido"||c.com_quem==="hapvida" ? 2 : 0, vidas:0, sem:SEMANAS.map(()=>0),
-      st:s, motivo: s==="ok" ? "" : `${st.t} ${quem}${detalhe?" · "+detalhe:""}`, gradePct:pctGrade(c.grade_comissao), grade:c.grade_comissao||"", _row:c});
+      st:s, motivo: s==="ok" ? "" : `${st.t} ${quem}${detalhe?" · "+detalhe:""}`, tel: soDig((papel()==="corretor"&&N.perfil.telefone) || ((c.responsaveis||[]).find(r=>soDig(r.telefone).length>=10)||{}).telefone || c.telefone || (String(c.contato||"").match(/\d[\d\s-]{8,}\d/)||[""])[0]), gradePct:pctGrade(c.grade_comissao), grade:c.grade_comissao||"", _row:c});
   });
   // FUNIL com a base real
   const total = N.corretoras.length, concl = N.corretoras.filter(c=>c.com_quem==="concluido").length;
@@ -129,7 +130,7 @@ async function carregar(){
     data:(d=>String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0"))(new Date(p.criado_em)), st:p.status}));
   // corretor sem corretora vinculada (ou declinada): mostra a área com o nome dele
   if(papel()==="corretor" && !C.some(c=>c.id===N.perfil.corretora_id)){
-    C.push({id:-1, nome:N.perfil.nome, corr:"Corretora parceira Viver", desde:"—", etapa:0, vidas:0, sem:SEMANAS.map(()=>0), st:"ok", motivo:"", gradePct:null, grade:""});
+    C.push({id:-1, tel:soDig(N.perfil.telefone), nome:N.perfil.nome, corr:"Corretora parceira Viver", desde:"—", etapa:0, vidas:0, sem:SEMANAS.map(()=>0), st:"ok", motivo:"", gradePct:null, grade:""});
   }
 }
 async function recarregar(msgOk){
@@ -395,9 +396,11 @@ function linhaUsuario(u){
   const acoes = eu ? `<span class="note">Seu acesso</span>` : `
     <button class="btn sm" data-ua="${u.status==="ativo"?"pausar":"reativar"}" data-uid="${u.id}">${u.status==="ativo"?"Pausar":"Reativar"}</button>
     <button class="btn sm" data-ua="senhaForm" data-uid="${u.id}">Editar senha</button>
+    <button class="btn sm" data-ua="telForm" data-uid="${u.id}">WhatsApp</button>
     <button class="btn sm ${N.acExcluir===u.id?"pri":""}" data-ua="excluir" data-uid="${u.id}" ${N.acExcluir===u.id?'style="background:var(--crit);border-color:var(--crit)"':""}>${N.acExcluir===u.id?"Confirmar exclusão":"Excluir"}</button>`;
-  return `<div class="ac-u"><div><b>${esc(u.nome)}</b><small class="num">${esc(acessoDe(u))}</small></div>${chipStatus(u.status)}<div class="ac-acoes">${acoes}</div>
-    ${N.acSenha===u.id?`<form class="ac-senha" data-senha="${u.id}"><input type="text" minlength="8" placeholder="Nova senha (mín. 8 caracteres)" aria-label="Nova senha" autocomplete="new-password"><button class="btn sm pri" type="submit">Salvar senha</button><button class="btn sm" type="button" data-ua="senhaCancel">Cancelar</button></form>`:""}</div>`;
+  return `<div class="ac-u"><div><b>${esc(u.nome)}</b><small class="num">${esc(acessoDe(u))}${u.telefone?" · WhatsApp "+esc(fmtTel(u.telefone)):""}</small></div>${chipStatus(u.status)}<div class="ac-acoes">${acoes}</div>
+    ${N.acSenha===u.id?`<form class="ac-senha" data-senha="${u.id}"><input type="text" minlength="8" placeholder="Nova senha (mín. 8 caracteres)" aria-label="Nova senha" autocomplete="new-password"><button class="btn sm pri" type="submit">Salvar senha</button><button class="btn sm" type="button" data-ua="senhaCancel">Cancelar</button></form>`:""}
+    ${N.acTel===u.id?`<form class="ac-senha ac-tel" data-tel="${u.id}"><input type="text" inputmode="tel" value="${esc(fmtTel(u.telefone||""))}" placeholder="WhatsApp com DDD (vai no PDF dos orçamentos)" aria-label="WhatsApp"><button class="btn sm pri" type="submit">Salvar WhatsApp</button><button class="btn sm" type="button" data-ua="telCancel">Cancelar</button></form>`:""}</div>`;
 }
 function formNovoUsuario(alvo){
   const equipe = alvo==="equipe";
@@ -405,6 +408,7 @@ function formNovoUsuario(alvo){
     <label>Nome<input name="nome" placeholder="Nome e sobrenome" required></label>
     <label>Login (e-mail ou nome.sobrenome)<input name="acesso" placeholder="${equipe?"nome@empresa.com.br ou nome.sobrenome":"nome@corretora.com.br"}" required autocomplete="off"></label>
     <label>Senha<input name="senha" type="text" minlength="8" placeholder="Mín. 8 caracteres" required autocomplete="new-password"></label>
+    <label>WhatsApp<input name="telefone" inputmode="tel" placeholder="(11) 99999-9999" autocomplete="off"></label>
     ${equipe?`<label>Perfil<select name="papel"><option value="gestor">Gestor Viver (vê tudo)</option><option value="hapvida">Hapvida (sem Pedidos e Acessos)</option></select></label>`:""}
     <div class="row"><button class="btn pri sm" type="submit">Criar acesso</button><button class="btn sm" type="button" data-ua="novoCancel">Cancelar</button></div>
     <div class="note ac-err" style="color:var(--crit)"></div></form>`;
@@ -451,6 +455,8 @@ AFTER.acessos = function(){
     if(ua==="novoCancel"){ N.acForm=null; render(); return; }
     if(ua==="senhaForm"){ N.acSenha=id; render(); const f=document.querySelector(`[data-senha="${id}"] input`); if(f) f.focus(); return; }
     if(ua==="senhaCancel"){ N.acSenha=null; render(); return; }
+    if(ua==="telForm"){ N.acTel=id; render(); const f=document.querySelector(`[data-tel="${id}"] input`); if(f) f.focus(); return; }
+    if(ua==="telCancel"){ N.acTel=null; render(); return; }
     if(ua==="copiar"){ const r=N.acResult; if(!r) return; const t=`Portal Viver Assessoria\nSite: ${location.origin}\nLogin: ${r.acesso}\nSenha: ${r.senha}`;
       try{ navigator.clipboard.writeText(t).then(()=>toast("Dados de acesso copiados"),()=>toast("Selecione e copie os dados.")); }catch(err){ toast("Selecione e copie os dados."); } return; }
     if(ua==="excluir" && N.acExcluir!==id){ N.acExcluir=id; render(); setTimeout(()=>{ if(N.acExcluir===id){ N.acExcluir=null; if(page==="acessos") render(); } },5000); return; }
@@ -461,7 +467,11 @@ AFTER.acessos = function(){
       await carregarUsuarios();
     }
   };
-  document.querySelectorAll("form.ac-senha").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();
+  document.querySelectorAll("form.ac-tel").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault(); e.stopImmediatePropagation();
+    const t=soDig(f.querySelector("input").value); if(t && t.length<10) return toast("Digite o WhatsApp com DDD.");
+    try{ await chamarUsuarios({acao:"telefone", id:f.dataset.tel, telefone:t}); N.acTel=null; toast("WhatsApp salvo"); await carregarUsuarios(); }catch(err){ toast(err.message); }
+  }));
+  document.querySelectorAll("form.ac-senha:not(.ac-tel)").forEach(f=>f.addEventListener("submit",async e=>{e.preventDefault();
     const s=f.querySelector("input").value; if(s.length<8) return toast("A senha precisa ter pelo menos 8 caracteres.");
     try{ await chamarUsuarios({acao:"senha", id:f.dataset.senha, senha:s}); N.acSenha=null; toast("Senha alterada"); render(); }catch(err){ toast(err.message); }
   }));
@@ -473,7 +483,7 @@ AFTER.acessos = function(){
     if(v("senha").length<8) return errEl.textContent="A senha precisa ter pelo menos 8 caracteres.";
     const btn=f.querySelector("[type=submit]"); btn.disabled=true; errEl.textContent="";
     try{
-      const d=await chamarUsuarios({acao:"criar", nome:v("nome"), email:v("acesso"), senha:v("senha"), papel:equipe?v("papel"):"corretor", corretora_id:equipe?null:+alvo});
+      const d=await chamarUsuarios({acao:"criar", nome:v("nome"), email:v("acesso"), senha:v("senha"), telefone:soDig(v("telefone")), papel:equipe?v("papel"):"corretor", corretora_id:equipe?null:+alvo});
       N.acResult={nome:v("nome"), acesso:d.acesso, senha:d.senha}; N.acForm=null;
       toast("Acesso criado"); await carregarUsuarios(); window.scrollTo({top:0,behavior:"smooth"});
     }catch(err){ btn.disabled=false; errEl.textContent=err.message; }
@@ -528,6 +538,22 @@ function ouvirNotificacoes(){
     .subscribe();
 }
 
+/* ───────── Carol (IA pelo Supabase) e PDF dos orçamentos ───────── */
+window.viverCarolIA = async function(turns){
+  const r = await sb.functions.invoke("carol",{body:{mensagens:turns}});
+  if(r.error){ let m="A Carol não conseguiu responder agora."; try{ const j=await r.error.context.json(); if(j&&j.erro) m=j.erro; }catch(e){} throw new Error(m); }
+  if(!r.data||!r.data.resposta) throw new Error("A Carol não conseguiu responder agora.");
+  return r.data.resposta;
+};
+window.viverSalvarPDF = async function(blob, nome){
+  if(!N.uid) return null;
+  const caminho = N.uid + "/" + Date.now() + "-" + String(nome||"cotacao.pdf").replace(/[^A-Za-z0-9._-]+/g,"-");
+  const up = await sb.storage.from("orcamentos").upload(caminho, blob, {contentType:"application/pdf", upsert:false});
+  if(up.error) return null;
+  const s = await sb.storage.from("orcamentos").createSignedUrl(caminho, 60*24*3600);   // link vale 60 dias
+  return s.error ? null : s.data.signedUrl;
+};
+
 /* ───────── LOGIN ───────── */
 function loginParaEmail(t){
   t=String(t||"").trim().toLowerCase();
@@ -539,7 +565,7 @@ async function entrarNuvem(user, avisar){
   if(error||!pf){ await sb.auth.signOut(); msg("Este login não tem perfil no portal. Fale com a Viver.",true); return; }
   if(pf.status!=="ativo"){ await sb.auth.signOut(); msg("Seu acesso está pausado. Fale com a Viver.",true); return; }
   N.perfil=pf; N.uid=user.id; N.usuarios=null; N.acResult=null;
-  USER={email:pf.email, perfil:pf.papel==="corretor"?"corretor":"gestor", papel:pf.papel, nome:pf.nome};
+  USER={email:pf.email, perfil:pf.papel==="corretor"?"corretor":"gestor", papel:pf.papel, nome:pf.nome, tel:soDig(pf.telefone)||WHATS_VIVER};
   montarMenu();
   try{ await carregar(); }catch(e){ msg("Não foi possível carregar os dados: "+e.message,true); await sb.auth.signOut(); return; }
   ME = pf.papel==="corretor" ? (C.some(c=>c.id===pf.corretora_id)?pf.corretora_id:-1) : ((C.find(c=>c._row&&c._row.com_quem==="concluido")||C[0]||{id:-1}).id);
