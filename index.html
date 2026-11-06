@@ -289,6 +289,66 @@ td .sm{color:var(--muted);font-size:.76rem}
 .lg-foot{font-size:.74rem;color:var(--muted);text-align:center}
 .logout{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:9px;padding:6px 10px;font-weight:600;font-size:.76rem}
 .app[hidden]{display:none!important}
+/* ── CAROL (assistente do corretor e do gestor) ── */
+.cr-wrap{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;height:calc(100vh - 150px);min-height:480px}
+.cr-hist{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);min-height:0}
+.cr-nova{border:1px solid var(--line);background:var(--chip);color:var(--brand-strong);font-weight:700;border-radius:10px;padding:9px 10px;font-size:.82rem}
+.cr-nova:hover{border-color:var(--brand)}
+.cr-hist-tit{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.cr-busca{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit;font-size:.8rem;background:var(--surface-2);color:var(--fg);width:100%}
+.cr-hist-lista{overflow:auto;flex:1;display:flex;flex-direction:column;gap:2px;min-height:0}
+.cr-hi{text-align:left;border:0;background:transparent;border-radius:8px;padding:8px 9px;color:var(--fg);font-size:.8rem;line-height:1.3}
+.cr-hi:hover,.cr-hi.ativo{background:var(--chip)}
+.cr-hi small{display:block;color:var(--muted);font-size:.68rem;margin-top:2px}
+.cr-vazio{color:var(--muted);font-size:.78rem;padding:8px 4px}
+.cr-chat{background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;min-height:0;box-shadow:var(--shadow);overflow:hidden}
+.cr-topo{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.cr-topo strong{display:block;font-family:var(--f-display);font-size:.98rem}
+.cr-topo span{display:block;font-size:.74rem;color:var(--muted)}
+.cr-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#4AA2F0,#1F4E79);color:#fff;font-family:var(--f-display);font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--mint) 55%,transparent)}
+.cr-linha{display:flex;gap:8px;align-items:flex-end;align-self:flex-start;max-width:86%}
+.cr-linha .cr-av{width:30px;height:30px;font-size:.8rem;box-shadow:none}
+.cr-hist-btn{display:none;margin-left:auto;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);border-radius:8px;padding:6px 10px;font-size:.78rem;font-weight:600}
+.cr-msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px;background:var(--surface-2);min-height:0}
+.cr-m{padding:10px 14px;border-radius:14px;font-size:.88rem;line-height:1.55;word-wrap:break-word;min-width:0}
+.cr-m.eu{align-self:flex-end;max-width:78%;background:var(--navy);color:var(--surface);border-bottom-right-radius:4px}
+.cr-m.ela{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px;color:var(--fg)}
+.cr-m.ela ul{margin:4px 0 4px 18px;padding:0}
+.cr-m.erro{border-color:color-mix(in srgb,var(--crit) 45%,var(--line));color:var(--crit)}
+.cr-acoes{margin-top:6px;display:flex;gap:10px}
+.cr-acoes button{border:0;background:transparent;color:var(--muted);font-size:.72rem;padding:0;font-weight:600}
+.cr-acoes button:hover{color:var(--brand-strong)}
+.cr-aud{font-size:.68rem;opacity:.8;margin-right:4px}
+.cr-pensando{color:var(--muted);font-size:.8rem;display:flex;gap:6px;align-items:center}
+.cr-pensando i{width:6px;height:6px;border-radius:50%;background:var(--brand);display:inline-block;animation:crPulse 1s infinite ease-in-out}
+.cr-pensando i:nth-child(2){animation-delay:.15s}.cr-pensando i:nth-child(3){animation-delay:.3s}
+@keyframes crPulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.cr-boas{margin:auto;text-align:center;max-width:560px;color:var(--muted);font-size:.88rem}
+.cr-boas .cr-av{margin:0 auto;width:58px;height:58px;font-size:1.5rem}
+.cr-boas h3{color:var(--fg);font-size:1.1rem;margin:12px 0 6px}
+.cr-sug{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.cr-sug button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:7px 12px;font-size:.78rem}
+.cr-sug button:hover{border-color:var(--brand);color:var(--brand-strong)}
+.cr-entrada{display:flex;gap:8px;align-items:flex-end;padding:12px 14px;border-top:1px solid var(--line);background:var(--surface)}
+.cr-entrada textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:.88rem;max-height:140px;background:var(--surface-2);color:var(--fg);min-width:0}
+.cr-entrada textarea:focus{outline:2px solid color-mix(in srgb,var(--brand) 40%,transparent);outline-offset:0}
+.cr-mic,.cr-enviar{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);flex-shrink:0;display:grid;place-items:center}
+.cr-mic svg,.cr-enviar svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cr-enviar{background:var(--brand);color:#fff;border-color:var(--brand)}
+.cr-enviar.parar{background:var(--crit);border-color:var(--crit)}
+.cr-enviar:disabled{opacity:.5;cursor:default}
+.cr-mic.ouvindo{background:var(--crit);color:#fff;border-color:var(--crit);animation:crPulse 1.2s infinite}
+.cr-rodape{font-size:.7rem;color:var(--muted);padding:0 16px 10px;background:var(--surface)}
+@media (max-width:900px){
+  .cr-wrap{grid-template-columns:minmax(0,1fr);height:calc(100vh - 170px);min-height:440px}
+  .cr-hist{display:none;position:fixed;inset:80px 12px auto 12px;max-height:70vh;z-index:70}
+  .cr-hist.aberto{display:flex}
+  .cr-hist-btn{display:block}
+  .cr-linha,.cr-m.eu{max-width:94%}
+}
+body.com-fab .cr-wrap{height:calc(100vh - 215px)}
+@media (max-width:900px){body.com-fab .cr-wrap{height:calc(100vh - 245px)}}
+@media (prefers-reduced-motion:reduce){.cr-pensando i,.cr-mic.ouvindo{animation:none}}
 /* ── PAINEL FINANCEIRO (abre como dashboard própria, por cima do painel) ── */
 #finWrap{position:fixed;inset:0;z-index:120;background:#f0f2f7}
 #fin-frame{width:100%;height:100%;border:0;display:block}
@@ -422,6 +482,7 @@ const ICON = {
   folder:'<path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',
   chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/>',
   chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  carol:'<path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.8 1.9L21.7 18l-1.9.8L19 20.7l-.8-1.9L16.3 18l1.9-1.1z"/>',
   ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/>',
   calc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v3M8 18h.01M12 18h.01"/>',
@@ -525,6 +586,7 @@ const MENUS = {
   gestor:[
     {lbl:"Acompanhamento"},
     {id:"visao",t:"Visão geral",i:"home"},
+    {id:"carol",t:"Carol · assistente",i:"carol"},
     {id:"simulador",t:"Simulador de preços",i:"calc",sub:true},
     {id:"financeiro",t:"Painel financeiro",i:"chart"},
     {id:"corretores",t:"Corretores vinculados",i:"users"},
@@ -540,6 +602,7 @@ const MENUS = {
   corretor:[
     {lbl:"Minha área"},
     {id:"inicio",t:"Início",i:"home"},
+    {id:"carol",t:"Carol · assistente",i:"carol"},
     {id:"simulador",t:"Simulador de preços",i:"calc",sub:true},
     {id:"jornada",t:"Minha jornada",i:"route"},
     {id:"treinos",t:"Treinamentos",i:"cap"},
@@ -567,6 +630,7 @@ const TITLES = {
   materiais:["Materiais e documentos","Checklists e materiais de apoio Hapvida"],
   leads:["Banco de leads","Compre pacotes de leads para acelerar suas vendas"],
   apoio:["Pedir apoio","Fale com o time da Viver sobre qualquer etapa"],
+  carol:["Carol","Sua assistente da Viver: tire dúvidas sobre o portal, vendas e regras Hapvida"],
   simulador:["Simulador de preços","Tabelas Hapvida NotreDame: simulação, regras, rede e ferramentas"],
 };
 
@@ -585,7 +649,7 @@ function renderNav(){
   $("#whoName").textContent = nm; $("#whoAv").textContent = role==="gestor"?ini(USER.nome):ini(byId(ME).nome);
   window.VIVER_CORRETORA = role==="corretor" ? byId(ME).corr : "Viver Assessoria";
   window.VIVER_GESTOR = !!USER && USER.perfil==="gestor";
-  const fab=$("#fab"); fab.hidden = role!=="corretor";
+  const fab=$("#fab"); fab.hidden = role!=="corretor"; document.body.classList.toggle("com-fab", role==="corretor");
   fab.href = wa(WA.comercial,"Olá, time Viver! Sou "+byId(ME).nome+" e preciso de ajuda.");
 }
 // PAINEL FINANCEIRO — abre financeiro.html como dashboard própria; só para gestor
@@ -683,6 +747,243 @@ function estStatus(p){
   return {k:"ok", t:"No prazo", d, sla};
 }
 const estTotais = p=>{ const t={viver:0,corretor:0,hapvida:0}; p.hist.forEach(h=>{ if(t[h.resp]!=null) t[h.resp]+=diasDesde(h.ini,h.fim); }); return t; };
+
+/* ══════════════════════════════════════════
+   CAROL — assistente do corretor e do gestor (mesmos princípios da Laura)
+   Conhecimento: aba Regras / Praças / Ferramentas do simulador.html publicado (só o que está vigente)
+   + informações do portal Viver + dados de quem pergunta (corretor vê só os próprios).
+   IA: Claude, pelo próprio link do portal. Histórico: neste navegador, separado por e-mail.
+   ══════════════════════════════════════════ */
+const CAROL_API = "";   // endereço de uma função própria (ex.: Supabase "carol"), para a versão hospedada fora do Claude
+const CR = {itens:[], conversa:[], carregou:"", ocupado:false, ctl:null, rec:null, ouvindo:false, falou:"", cancelou:false, regras:null, regrasEm:0, sample:undefined};
+const crEsc = t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function crFmt(t){
+  const linhas=crEsc(t).split(/\n/), out=[]; let lista=false;
+  linhas.forEach(l=>{ const it=l.match(/^\s*(?:[-•]|\d+[.)])\s+(.*)$/);
+    if(it){ if(!lista){out.push("<ul>");lista=true;} out.push("<li>"+it[1]+"</li>"); return; }
+    if(lista){out.push("</ul>");lista=false;} out.push(l.trim()?l+"<br>":"<br>"); });
+  if(lista) out.push("</ul>");
+  return out.join("").replace(/<\/ul>(<br>)+/g,"</ul>").replace(/(<br>){3,}/g,"<br><br>").replace(/<br>$/,"")
+    .replace(/^#{1,4}\s*/gm,"").replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>").replace(/\*([^*\n]+)\*/g,"<strong>$1</strong>")
+    .replace(/(^|[\s(>])_([^_\n]+)_(?=[\s).,!?<]|$)/g,"$1<em>$2</em>");
+}
+const crChave = ()=>"viverCarol:"+(USER?USER.email:"");
+function crLer(){ try{ return JSON.parse(localStorage.getItem(crChave())||"[]"); }catch(e){ return []; } }
+function crGravar(){ try{ localStorage.setItem(crChave(), JSON.stringify(CR.itens.slice(0,60))); }catch(e){} }
+function crQuando(iso){ const d=new Date(iso), h=new Date(), hm=d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  return d.toDateString()===h.toDateString() ? "Hoje, "+hm : d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+hm; }
+const crHojeISO = ()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+
+// ── regras do simulador publicado (mesma leitura da Laura: Regras, Praças, Ferramentas e comunicados vigentes) ──
+function crTextoLimpo(h){
+  return h.replace(/<(script|style)[\s\S]*?<\/\1>/gi," ").replace(/<\s*(br|\/p|\/li|\/tr|\/h\d|\/div)\s*\/?>/gi,"\n")
+    .replace(/<\/t[dh]>/gi," | ").replace(/<li[^>]*>/gi,"• ").replace(/<[^>]+>/g," ")
+    .replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+    .replace(/[ \t]+/g," ").replace(/ *\n[ \n]*/g,"\n").trim();
+}
+// regra Viver: a Carol não fala de valores que a assessoria recebe (comissão da corretora, agenciamento, estorno, repasse, bonificação)
+const CR_TEMA_VALORES = /comiss|agenciamento|estorn|repasse|bonifica/i;
+const crSemValores = t=>t.split("\n").map(l=>l.replace(/;?\s*comiss[ãa]o normal\s*;?/gi,";").replace(/;\s*;/g,";")).filter(l=>!CR_TEMA_VALORES.test(l)).join("\n");
+async function crRegras(){
+  if(CR.regras && Date.now()-CR.regrasEm < 10*60e3) return CR.regras;
+  try{
+    const r = await fetch("simulador.html?carol="+Date.now(),{cache:"no-store"}); if(!r.ok) throw new Error("HTTP "+r.status);
+    const h = await r.text(), hoje = crHojeISO(), partes=[];
+    const ia=h.indexOf("const ATUALIZACOES_REGRAS = ["), ja= ia>=0 ? h.indexOf("\n];",ia) : -1;
+    if(ia>=0 && ja>ia){
+      const itens=[...h.slice(ia,ja).matchAll(/\{data:'(\d{4}-\d{2}-\d{2})',\s*(fim:true,\s*)?titulo:'([^']*)',\s*itens:\[([\s\S]*?)\]\}/g)].map(m=>{
+        const linhas=[...m[4].matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(x=>"  • "+crTextoLimpo(x[1]));
+        const quando = m[2] ? "encerrada em "+m[1] : (m[1]<=hoje ? "vigente desde "+m[1] : "vale a partir de "+m[1]);
+        return "- "+m[3]+" ("+quando+")\n"+linhas.join("\n"); });
+      if(itens.length) partes.push("## Atualizações de regras da operadora (mais recentes primeiro)\n"+itens.join("\n"));
+    }
+    const doc = new DOMParser().parseFromString(h,"text/html");
+    doc.querySelectorAll("[data-valido-ate]").forEach(el=>{ if(el.getAttribute("data-valido-ate") < hoje) el.remove(); });
+    const sec=(id,tit)=>{ const el=doc.getElementById(id); if(!el) return;
+      let html=el.innerHTML.replace('<div id="regras-sp"','\n### REGRAS SÃO PAULO E RIO DE JANEIRO\n<div id="regras-sp"').replace('<div id="regras-ce"','\n### REGRAS CEARÁ (FORTALEZA)\n<div id="regras-ce"');
+      const t=crTextoLimpo(html); if(t) partes.push("## "+tit+"\n"+t); };
+    sec("sec-regras","Aba Regras do Simulador (SP/RJ e Ceará)"); sec("sec-filiais","Praças e filiais"); sec("sec-ferramentas","Ferramentas do Simulador"); sec("sec-rede","Rede de atendimento");
+    CR.regras = partes.length ? crSemValores(partes.join("\n\n")).slice(0,150000) : "(As regras do Simulador não estão disponíveis agora.)";
+    CR.regrasEm = Date.now();
+  }catch(e){ if(!CR.regras) CR.regras = "(As regras do Simulador não puderam ser carregadas agora.)"; }
+  return CR.regras;
+}
+
+// ── o que a Carol sabe do portal (montado a partir do próprio painel, então acompanha as atualizações) ──
+function crPortal(){
+  const gestor = USER && USER.perfil==="gestor";
+  const zap = l=>l.u.split("/").pop().replace(/^55(\d\d)(\d{5})(\d{4})$/,"($1) $2-$3");
+  const menus = m=>MENUS[m].filter(x=>!x.lbl).map(x=>"- "+x.t+(TITLES[x.id]?": "+TITLES[x.id][1]:"")).join("\n");
+  let t = "## O portal Viver Assessoria\nA Viver Assessoria dá suporte a corretores parceiros que vendem Hapvida NotreDame Intermédica (PF e CNPJ). Lema: \"Você vende, a gente cuida do processo.\"\n";
+  t += "\n### Menu do corretor\n"+menus("corretor");
+  if(gestor) t += "\n\n### Menu do gestor\n"+menus("gestor")+"\n- Painel financeiro: abre como dashboard própria (só gestor); para voltar, use \"← Voltar ao painel\".";
+  t += "\n\n### Jornada do corretor na Viver (8 etapas, em ordem)\n"+JORNADA.map((j,i)=>(i+1)+". "+j.t+": "+j.d).join("\n");
+  t += "\n\n### O que a Viver faz pelo corretor (8 pilares)\n"+PILARES.map(p=>"- "+p[0]+": "+p[1]).join("\n");
+  t += "\n\n### Documentos para abrir o código Hapvida (7 itens)\n"+DOCS7.map(d=>"- "+d).join("\n")+"\nAntes de enviar, conferir o CNAE, os dados em PJ e se o PGDAS está válido.";
+  t += "\n\n### Documentos para se vincular à Viver (4 itens; enviar direto ao supervisor)\n"+DOCS4.map(d=>"- "+d).join("\n");
+  t += "\n\n### Treinamentos disponíveis (menu Treinamentos; sem link liberado, o corretor pede acesso e vira pedido para o time)\n"+TREINOS.map(x=>"- "+x.t+" ("+x.tipo+", "+x.dur+"): "+x.d).join("\n");
+  t += "\n\n### Kit de design (menu Kit de design)\nO corretor envia a logo dele, vê a prévia em 3 posts e pede o kit ao marketing (feed, stories e WhatsApp).";
+  t += "\n\n### Banco de leads (menu Banco de leads)\n"+PACKS.map(p=>"- Pacote "+p.nome+": "+p.q+" leads a "+brl(p.pl)+" por lead = "+brl(p.q*p.pl)+" ("+p.itens.join("; ")+")").join("\n")+"\nO pedido entra no painel da Viver e o pagamento é combinado no WhatsApp do comercial.";
+  t += "\n\n### Simulador de preços (menu Simulador de preços)\nSubmenu: Simulador, Regras, Rede de Atendimento e Ferramentas. Para preço, o corretor monta a cotação no Simulador; o PDF do orçamento sai com o nome da corretora dele.";
+  t += "\n\n### Pedir apoio (menu Pedir apoio, ou botão do WhatsApp)\nDigitação, pós-venda e financeiro: Suporte Administrativo. Marketing, comercial e treinamento: Suporte Comercial.\n"+LINKS.filter(l=>l.w).map(l=>"- "+l.t+": WhatsApp "+zap(l)).join("\n");
+  t += "\n\n### Links úteis (menu Links úteis)\n"+LINKS.filter(l=>!l.w).map(l=>"- "+l.t+": "+l.u).join("\n");
+  t += "\n\n### Condições da parceria divulgadas ao corretor\n- Comissão: 300% + 2% (material de divulgação da Viver); no portal, a comissão estimada usa 300% do ticket médio.\n- Vitalício: R$ 6 por mês por vida ativa.\n- Carteira 100% do corretor, apoio na digitação, apoio jurídico, ferramenta multicálculo, estrutura presencial, premiações e leads qualificados.\n- Valores de bonificação e regras específicas: confirmar com o supervisor.";
+  if(gestor){
+    t += "\n\n### Esteira de vínculos (só gestor)\n"+Object.values(FLUXOS).map(fl=>fl.nome+": "+fl.etapas.map(e=>e.t+" ("+RESP[e.resp].t+(e.resp!=="concluido"?", SLA "+e.sla+"d":"")+")").join(" → ")).join("\n")+"\nPendência devolvida ao corretor: SLA "+SLA_PEND.v+"d. Prazos em dias corridos.";
+  }
+  return t;
+}
+function crDados(){
+  const gestor = USER && USER.perfil==="gestor";
+  if(!gestor){
+    const me=byId(ME), meus=PED.filter(p=>p.c===ME);
+    return "## Dados de quem pergunta (só deste corretor)\nCorretor: "+me.nome+" · Corretora: "+(me.corr||"")+"\nJornada: "+me.etapa+" de 8 etapas concluídas; próxima: "+(JORNADA[me.etapa]?JORNADA[me.etapa].t:"jornada completa")
+      +"\nVidas no mês: "+me.vidas+" (meta 5) · Comissão NF estimada: "+brl(me.vidas*900)+" · Vitalício: R$ 6 por vida ativa"
+      +"\nPedidos: "+(meus.length?meus.map(p=>p.assunto+" ("+(p.tipo==="leads"?"leads":p.tipo==="treinamento"?"treinamento":p.cat)+", "+p.data+", "+p.st+")").join("; "):"nenhum");
+  }
+  const at = EST.filter(p=>estResp(p)!=="concluido").map(p=>{ const st=estStatus(p), a=estAtual(p); return "- "+p.corretora+" ("+FLUXOS[p.tipo].curto+"): com "+RESP[a.resp].t+" — "+a.t+" — há "+st.d+" dia(s), SLA "+st.sla+"d — "+st.t; });
+  return "## Dados da operação (visão do gestor; dados de exemplo do portal)\nCorretores vinculados ("+C.length+"):\n"+C.map(c=>"- "+c.nome+" · "+c.corr+" · jornada "+c.etapa+"/8 · "+c.vidas+" vidas no mês · "+({ok:"em dia",warn:"atenção",crit:"precisa de apoio"}[c.st])+(c.motivo?" ("+c.motivo+")":"")).join("\n")
+    +"\n\nPedidos em aberto:\n"+(PED.filter(p=>!["concluído","entregue"].includes(p.st)).map(p=>"- "+byId(p.c).nome+": "+p.assunto+" ("+p.tipo+", "+p.data+", "+p.st+")").join("\n")||"nenhum")
+    +"\n\nEsteira de vínculos em andamento:\n"+(at.join("\n")||"nenhum processo");
+}
+function crInstrucoes(regras, saudar){
+  const gestor = USER && USER.perfil==="gestor", nome=(USER&&USER.nome)||"", primeiro=nome.split(" ")[0];
+  const hoje=new Date().toLocaleDateString("pt-BR");
+  return `Você é a Carol, assistente da Viver Assessoria dentro do portal do corretor parceiro. Você ajuda ${gestor?"a gestão da Viver e os corretores":"os corretores parceiros"} com dúvidas sobre o sistema (o portal), vendas e regras comerciais, produtos, carências, campanhas, documentação e rede dos planos Hapvida NotreDame Intermédica.
+Quem está falando com você: ${gestor?nome+" (gestor da Viver)":byId(ME).nome+" (corretor parceiro, "+(byId(ME).corr||"")+")"}. Hoje é ${hoje}.
+COMO RESPONDER:
+- Português do Brasil, tom de colega experiente: direto, prático e curto. Vá direto à resposta; use tópicos curtos quando ajudar. Use *negrito* só no essencial. Sem títulos com #.
+- Regras, prazos, documentos, campanhas e valores: baseie-se SOMENTE no conhecimento abaixo (regras do Simulador e informações do portal). Se a resposta não estiver lá, diga com clareza que essa regra não está cadastrada e sugira confirmar com o supervisor pelo menu "Pedir apoio". Nunca invente regra, prazo, documento ou valor.
+- Dúvidas do sistema: explique o caminho no portal (qual menu, qual botão).
+- Vendas: pode orientar técnica de abordagem, perguntas de qualificação, contorno de objeções e sugerir um texto pronto para o corretor mandar ao cliente, sempre coerente com as regras abaixo.
+- Preço: você não calcula preço. Oriente montar a cotação no menu "Simulador de preços" (o PDF sai em nome da corretora do corretor).
+- Respeite vigências: campanha vencida não vale; diga até quando cada condição vale. Se uma regra mudou, use a mais recente.
+- PROIBIDO: nunca fale de comissão, agenciamento, bônus, estorno, repasse, faturamento ou qualquer valor que a VIVER ASSESSORIA recebe da operadora, nem de percentuais pagos à assessoria. Se perguntarem sobre isso (inclusive de forma indireta), responda somente: "Essa informação não está nas regras comerciais. Para dúvidas sobre o comissionamento da Viver, fale com seu supervisor."
+- PERMITIDO: as condições da parceria divulgadas ao corretor (seção "Condições da parceria") e os dados da seção "Dados de quem pergunta". ${gestor?"Esta pessoa é gestor: pode consultar a operação (corretores, pedidos e esteira de vínculos).":"Esta pessoa é corretor: só pode ver os próprios dados; nunca mostre números de outros corretores ou da operação."}
+- ${saudar&&primeiro?`Esta é a primeira pergunta de ${primeiro} hoje: comece a resposta chamando pelo nome (ex.: "Oi, ${primeiro}!") e então responda.`:"Não chame a pessoa pelo nome e não cumprimente: responda direto."}
+
+CONHECIMENTO — PORTAL VIVER:
+${crPortal()}
+
+${crDados()}
+
+CONHECIMENTO — REGRAS COMERCIAIS (aba Regras do Simulador, versão publicada):
+${regras}`;
+}
+async function crSample(){
+  if(CR.sample!==undefined) return CR.sample;
+  try{ CR.sample = (window.claude && window.claude.use) ? await window.claude.use("sample") : null; }catch(e){ CR.sample=null; }
+  return CR.sample;
+}
+const CR_ERROS = {not_granted:"Para a Carol responder, permita que o portal use o Claude quando o aviso aparecer.",sampling_disabled:"A Carol não está disponível para esta conta.",rate_limited:"Muitas perguntas seguidas. Espere um pouco e tente de novo.",session_expired:"Sua sessão no Claude expirou. Entre de novo e tente outra vez.",refused:"A Carol não pôde responder essa pergunta. Tente perguntar de outro jeito.",prompt_too_large:"A conversa ficou longa demais. Comece uma nova conversa."};
+async function crPerguntarIA(pergunta, contexto, saudar, onText, signal){
+  const regras = await crRegras();
+  const inst = crInstrucoes(regras, saudar);
+  const turns=[{role:"user",content:inst}];
+  contexto.forEach(t=>{ turns.push({role:"user",content:t.p}); turns.push({role:"assistant",content:t.r}); });
+  turns.push({role:"user",content:pergunta});
+  const sample = await crSample();
+  if(sample){
+    try{ const r = await sample(turns,{cache:false, signal, onText:({text})=>onText(text)}); return r.text; }
+    catch(e){ const err=new Error(CR_ERROS[e&&e.code]||"A Carol não conseguiu responder agora. Tente de novo."); err.code=e&&e.code; err.parcial=e&&e.text; throw err; }
+  }
+  if(CAROL_API){
+    const r = await fetch(CAROL_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mensagens:turns}),signal});
+    const j = await r.json().catch(()=>({})); if(!r.ok||!j.resposta) throw new Error(j.erro||"A Carol não conseguiu responder agora.");
+    onText(j.resposta); return j.resposta;
+  }
+  throw new Error("A Carol responde pelo link do portal Viver no Claude. Nesta cópia hospedada ela ainda não está ligada a uma IA.");
+}
+// ── tela ──
+function carolAbrir(){
+  if(CR.carregou!==crChave()){ CR.carregou=crChave(); CR.itens=crLer(); CR.conversa=[]; }
+  carolRenderHist();
+  if(CR.conversa.length) carolRenderConversa(); else carolBoasVindas();
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) $("#cr-mic").hidden=true;
+  crRegras();   // já deixa as regras prontas
+}
+function carolRenderHist(){
+  const box=$("#cr-hist-lista"); if(!box) return;
+  const q=(($("#cr-busca")||{}).value||"").trim().toLowerCase();
+  const lst=CR.itens.filter(i=>!q||String(i.pergunta).toLowerCase().includes(q)||String(i.resposta||"").toLowerCase().includes(q));
+  if(!lst.length){ box.innerHTML='<div class="cr-vazio">'+(q?"Nada encontrado.":"Suas perguntas aparecem aqui.")+'</div>'; return; }
+  box.innerHTML=lst.map(i=>'<button type="button" class="cr-hi" data-crid="'+i.id+'">'+(i.via_audio?'<span class="cr-aud">🎤</span>':"")+crEsc(String(i.pergunta).slice(0,90))+'<small>'+crQuando(i.criado_em)+'</small></button>').join("");
+}
+function carolReabrir(id){
+  const i=CR.itens.find(x=>x.id===id); if(!i||CR.ocupado) return;
+  CR.conversa=[{p:i.pergunta,r:i.resposta,audio:i.via_audio}]; carolRenderConversa();
+  document.querySelectorAll(".cr-hi").forEach(b=>b.classList.toggle("ativo",+b.dataset.crid===id));
+  const h=$("#cr-hist"); if(h) h.classList.remove("aberto");
+}
+function carolNova(){
+  if(CR.ocupado) return; CR.conversa=[]; carolBoasVindas();
+  document.querySelectorAll(".cr-hi").forEach(b=>b.classList.remove("ativo"));
+  const h=$("#cr-hist"); if(h) h.classList.remove("aberto"); const t=$("#cr-txt"); if(t) t.focus();
+}
+function carolBoasVindas(){
+  const box=$("#cr-msgs"); if(!box) return;
+  const gestor = USER && USER.perfil==="gestor";
+  const sug = gestor
+    ? ["Quem está com o SLA atrasado na esteira?","Quais corretores precisam de apoio?","Quais pedidos de apoio estão abertos?","Quais documentos para abrir código novo?","Quais campanhas valem agora?","Quem aceita cópia de carência especial?"]
+    : ["Qual é o próximo passo da minha jornada?","Quais documentos preciso para abrir meu código?","Quais campanhas valem agora?","Quem aceita cópia de carência especial?","Como peço meu kit de design?","Como respondo um cliente que achou caro?"];
+  box.innerHTML='<div class="cr-boas"><div class="cr-av">C</div><h3>Oi! Eu sou a Carol.</h3><div>Pergunte sobre o portal, vendas, regras, campanhas, carências, documentos e rede. Pode escrever'+($("#cr-mic")&&!$("#cr-mic").hidden?" ou tocar no microfone e falar":"")+'.</div><div class="cr-sug">'+sug.map(s=>'<button type="button" data-crsug>'+crEsc(s)+'</button>').join("")+'</div></div>';
+}
+function carolRenderConversa(pensando){
+  const box=$("#cr-msgs"); if(!box) return;
+  let h="";
+  CR.conversa.forEach((t,k)=>{
+    h+='<div class="cr-m eu">'+(t.audio?'<span class="cr-aud">🎤</span>':"")+crEsc(t.p)+'</div>';
+    if(t.r) h+='<div class="cr-linha"><div class="cr-av">C</div><div class="cr-m ela">'+crFmt(t.r)+(t.parcial?"":'<div class="cr-acoes"><button type="button" data-crcopiar="'+k+'">Copiar resposta</button></div>')+'</div></div>';
+    if(t.erro) h+='<div class="cr-linha"><div class="cr-av">C</div><div class="cr-m ela erro">'+crEsc(t.erro)+'</div></div>';
+  });
+  if(pensando) h+='<div class="cr-linha"><div class="cr-av">C</div><div class="cr-pensando"><i></i><i></i><i></i> Carol está consultando as regras…</div></div>';
+  box.innerHTML=h; box.scrollTop=box.scrollHeight;
+}
+function carolAltura(el){ el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,140)+"px"; }
+function carolBotao(){ const b=$("#cr-enviar"); if(!b) return; b.classList.toggle("parar",CR.ocupado); b.title=CR.ocupado?"Parar":"Enviar"; b.setAttribute("aria-label",b.title);
+  b.innerHTML=CR.ocupado?'<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>':'<svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>'; }
+async function carolEnviar(viaAudio){
+  if(CR.ocupado){ CR.ctl&&CR.ctl.abort(); return; }
+  const el=$("#cr-txt"); if(!el) return; const p=el.value.trim(); if(!p) return;
+  if(CR.ouvindo) carolPararMic(true);
+  el.value=""; carolAltura(el);
+  const contexto=CR.conversa.filter(t=>t.r&&!t.parcial).slice(-6).map(t=>({p:t.p,r:t.r}));
+  const turno={p, audio:!!viaAudio}; CR.conversa.push(turno);
+  let saudar=false; try{ const k="viverCarolDia:"+USER.email; saudar = localStorage.getItem(k)!==crHojeISO(); localStorage.setItem(k,crHojeISO()); }catch(e){ saudar = !CR.itens.some(i=>String(i.criado_em).slice(0,10)===new Date().toISOString().slice(0,10)); }
+  CR.ocupado=true; CR.ctl=new AbortController(); carolBotao(); carolRenderConversa(true);
+  try{
+    const r = await crPerguntarIA(p, contexto, saudar, txt=>{ turno.r=txt; turno.parcial=true; if(page==="carol") carolRenderConversa(); }, CR.ctl.signal);
+    turno.r=r; turno.parcial=false;
+    const item={id:Date.now(), pergunta:p, resposta:r, criado_em:new Date().toISOString(), via_audio:!!viaAudio};
+    CR.itens.unshift(item); crGravar(); carolRenderHist();
+  }catch(e){
+    if(e && e.name==="AbortError"){ turno.parcial=false; if(!turno.r) turno.erro="Resposta interrompida."; }
+    else if(e && e.code==="cancelled"){ turno.r=e.parcial||turno.r; turno.parcial=false; if(!turno.r) turno.erro="Resposta interrompida."; }
+    else { turno.parcial=false; if(e && e.parcial) turno.r=e.parcial; turno.erro=(e&&e.message)||"A Carol não conseguiu responder agora."; }
+  }
+  CR.ocupado=false; CR.ctl=null; if(page==="carol"){ carolBotao(); carolRenderConversa(false); }
+}
+// ── áudio: o corretor fala e a Carol entende (Chrome, Edge, Safari) ──
+function carolMic(){
+  if(CR.ouvindo){ carolPararMic(false); return; }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ toast("Este navegador não reconhece fala. Use o Chrome, o Edge ou o Safari."); return; }
+  const rec=new SR(); CR.rec=rec; CR.falou="";
+  rec.lang="pt-BR"; rec.interimResults=true; rec.continuous=true;
+  const el=$("#cr-txt"), base=el.value?el.value.trim()+" ":"";
+  rec.onresult=ev=>{ let fim="",parc=""; for(let i=0;i<ev.results.length;i++){ if(ev.results[i].isFinal) fim+=ev.results[i][0].transcript; else parc+=ev.results[i][0].transcript; }
+    CR.falou=(fim+" "+parc).trim(); el.value=base+CR.falou; carolAltura(el); };
+  rec.onerror=ev=>{ if(ev.error==="not-allowed"||ev.error==="service-not-allowed") toast("Libere o microfone para o site no navegador.");
+    else if(ev.error!=="no-speech"&&ev.error!=="aborted") toast("Não consegui ouvir. Tente de novo."); };
+  rec.onend=()=>{ const t=$("#cr-txt"); const enviar=CR.ouvindo&&!CR.cancelou&&t&&t.value.trim(); CR.ouvindo=false; CR.cancelou=false;
+    const m=$("#cr-mic"); if(m) m.classList.remove("ouvindo"); const r=$("#cr-rodape"); if(r) r.textContent=CR_RODAPE;
+    if(enviar&&CR.falou) carolEnviar(true); };
+  try{ rec.start(); }catch(e){ toast("Não consegui abrir o microfone."); return; }
+  CR.ouvindo=true; CR.cancelou=false; $("#cr-mic").classList.add("ouvindo");
+  $("#cr-rodape").textContent="Ouvindo… fale sua pergunta e toque no microfone de novo para enviar.";
+}
+function carolPararMic(cancelar){ CR.cancelou=!!cancelar; try{ CR.rec&&CR.rec.stop(); }catch(e){} }
+const CR_RODAPE="A Carol usa as regras do Simulador e as informações do portal. Confira sempre as condições antes de fechar.";
 const VIEWS = {
 /* ---------- GESTOR ---------- */
 visao(){
@@ -767,6 +1068,27 @@ esteira(){
   <div class="card" style="margin-top:16px"><div class="card-h"><h2>SLA por etapa</h2><p>Dias corridos · altere e a esteira recalcula na hora</p></div>
     <div class="grid half">${Object.entries(FLUXOS).map(([k,fl])=>`<div><h3 style="margin-bottom:8px">${fl.nome}</h3><div class="tl">${fl.etapas.map((e,i)=>`<div class="tl-r"><span class="resp" style="--rc:${RESP[e.resp].c}">${RESP[e.resp].t}</span><span>${e.t}</span>${e.resp==="concluido"?"<span></span>":`<input class="sla-in num" type="number" min="0" max="60" id="sla-${k}-${i}" data-sla="${k}|${i}" value="${e.sla}" aria-label="SLA em dias">`}</div>`).join("")}
       ${k==="novo"?`<div class="tl-r"><span class="resp" style="--rc:${RESP.corretor.c}">Corretor</span><span>Resolver pendência devolvida (qualquer caminho)</span><input class="sla-in num" type="number" min="0" max="60" id="sla-pend" data-sla="pend" value="${SLA_PEND.v}" aria-label="SLA em dias"></div>`:""}</div></div>`).join("")}</div>
+  </div>`;
+},
+carol(){
+  return `<div class="cr-wrap">
+    <aside class="cr-hist" id="cr-hist">
+      <button type="button" class="cr-nova" id="cr-nova">＋ Nova conversa</button>
+      <div class="cr-hist-tit">Pesquisas recentes</div>
+      <input type="search" class="cr-busca" id="cr-busca" placeholder="Buscar no histórico" aria-label="Buscar no histórico">
+      <div class="cr-hist-lista" id="cr-hist-lista"><div class="cr-vazio">Carregando…</div></div>
+    </aside>
+    <section class="cr-chat">
+      <div class="cr-topo"><div class="cr-av">C</div><div><strong>Carol</strong><span>Assistente da Viver · portal, vendas, regras, campanhas e rede</span></div>
+        <button type="button" class="cr-hist-btn" id="cr-hist-btn">Histórico</button></div>
+      <div class="cr-msgs" id="cr-msgs" aria-live="polite"></div>
+      <div class="cr-entrada">
+        <button type="button" class="cr-mic" id="cr-mic" title="Falar com a Carol" aria-label="Falar com a Carol"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <textarea id="cr-txt" rows="1" placeholder="Pergunte para a Carol… (Enter envia, Shift+Enter quebra linha)" aria-label="Sua pergunta"></textarea>
+        <button type="button" class="cr-enviar" id="cr-enviar" title="Enviar" aria-label="Enviar"><svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="cr-rodape" id="cr-rodape">${CR_RODAPE}</div>
+    </section>
   </div>`;
 },
 "g-treinos"(){return pedTable("treinamento",["Agendar","Concluir"])},
@@ -904,6 +1226,25 @@ const today=()=>{const d=new Date();return String(d.getDate()).padStart(2,"0")+"
 function addPed(o){PED.push({id:nextId++,c:ME,data:today(),st:"aberto",...o})}
 
 const AFTER = {
+  carol(){
+    carolAbrir(); carolBotao();
+    $("#cr-nova").onclick=carolNova;
+    $("#cr-busca").oninput=carolRenderHist;
+    $("#cr-hist-btn").onclick=()=>$("#cr-hist").classList.toggle("aberto");
+    $("#cr-mic").onclick=carolMic;
+    $("#cr-enviar").onclick=()=>carolEnviar();
+    const t=$("#cr-txt"); t.oninput=()=>carolAltura(t); t.onkeydown=ev=>{ if(ev.key==="Enter"&&!ev.shiftKey){ ev.preventDefault(); carolEnviar(); } };
+    $("#cr-hist-lista").onclick=e=>{ const b=e.target.closest("[data-crid]"); if(b) carolReabrir(+b.dataset.crid); };
+    $("#cr-msgs").onclick=e=>{
+      const s=e.target.closest("[data-crsug]"); if(s){ t.value=s.textContent; carolEnviar(); return; }
+      const c=e.target.closest("[data-crcopiar]"); if(c){ const tt=CR.conversa[+c.dataset.crcopiar]; if(!tt) return;
+        const txt=String(tt.r).replace(/\*\*?([^*\n]+)\*\*?/g,"$1");
+        const ok=()=>{ c.textContent="Copiado ✓"; setTimeout(()=>{ c.textContent="Copiar resposta"; },1500); }, falhou=()=>toast("Não deu para copiar. Selecione o texto e copie.");
+        try{ navigator.clipboard.writeText(txt).then(ok,falhou); }catch(err){ falhou(); } }
+    };
+    if(window.innerWidth>900) setTimeout(()=>t.focus(),50);
+  },
+
   esteira(){
     $("#estFil").addEventListener("click",e=>{const b=e.target.closest("[data-ef]");if(!b)return;estFiltro=b.dataset.ef;render()});
     $("#estNovoBtn").onclick=()=>{estNovo=true;render();$("#eCorr").focus()};
@@ -1039,7 +1380,7 @@ $("#fLogin").addEventListener("submit",e=>{e.preventDefault();
   if(!pw) return msg("Digite sua senha. Na demonstração qualquer senha funciona.",true);
   entrar(em,$("#lLembrar").checked)});
 $("#logout").onclick=()=>{try{localStorage.removeItem("viverUser");sessionStorage.removeItem("viverUser")}catch(e){}
-  USER=null;window.VIVER_GESTOR=false;fecharFinanceiro();$("#app").hidden=true;$("#login").hidden=false;$("#fab").hidden=true;closeSide();$("#lSenha").value="";$("#lMsg").hidden=true};
+  if(CR.ctl) CR.ctl.abort(); CR.conversa=[]; CR.carregou=""; USER=null;window.VIVER_GESTOR=false;fecharFinanceiro();$("#app").hidden=true;$("#login").hidden=false;$("#fab").hidden=true;closeSide();$("#lSenha").value="";$("#lMsg").hidden=true};
 (function(){let saved=null;try{saved=JSON.parse(localStorage.getItem("viverUser")||sessionStorage.getItem("viverUser")||"null")}catch(e){}
   if(saved&&saved.email) entrar(saved.email,true);})();
 </script>
