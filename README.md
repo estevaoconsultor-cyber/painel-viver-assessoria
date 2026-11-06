@@ -11,4 +11,13 @@ Site estático: na Vercel, importe o repositório sem framework e sem comando de
 
 Carol (assistente): responde pelo Claude quando o portal é aberto pelo link do Claude. Na cópia hospedada (Vercel), preencha `CAROL_API` no `index.html` com o endereço de uma função própria (ex.: Supabase) que receba `{mensagens}` e devolva `{resposta}`.
 
-Versão de demonstração: login aceita qualquer senha e os dados são de exemplo.
+## Login e dados reais (Supabase, projeto `viver-portal`)
+
+- `nuvem.js` — login real, dados das corretoras, esteira gravada no banco, menu Acessos e aviso "+1 corretor concluído"
+- `supabase.js` — biblioteca do Supabase (v2.45.4), servida pelo próprio site
+- `supabase/functions/viver-usuarios` — função que cria, pausa, reativa, exclui e troca a senha dos usuários (só gestor Viver)
+
+Perfis: **gestor** (Viver, vê tudo), **hapvida** (vê tudo menos Pedidos e Acessos), **corretor** (só a própria corretora).
+Quem entra com usuário (nome.sobrenome) em vez de e-mail recebe um e-mail interno `@acesso.viverassessoriacomercial.com.br`.
+
+O link do Claude continua sendo a versão de demonstração (dados de exemplo); o site usa só dados reais.

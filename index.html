@@ -413,6 +413,42 @@ body.fin-aberto{overflow:hidden}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
+<style>
+.nv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.nv-resp-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+.nv-resp{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1.3fr) auto;gap:10px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+.ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:4px}
+.ficha div{background:var(--chip);border-radius:10px;padding:9px 11px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ficha span{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.ficha b{font-size:.86rem;overflow-wrap:anywhere}
+.ficha-resp{display:grid;gap:8px;margin-top:10px}
+.ficha-resp div{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:.84rem}
+.ficha-resp span{color:var(--muted)}
+.ficha-resp .btn{margin-left:auto}
+.ac-busca{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:8px 12px;font:inherit;font-size:.84rem;min-width:min(260px,100%)}
+.ac-lista{display:grid;gap:12px}
+.ac-c{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.ac-c-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.ac-c-h small{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}
+.ac-u{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px 12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.ac-u small{display:block;color:var(--muted);font-size:.76rem;overflow-wrap:anywhere}
+.ac-acoes{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.ac-senha{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.ac-senha input{flex:1;min-width:180px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:7px 10px;font:inherit;font-size:.84rem}
+.ac-novo{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;align-items:end;background:var(--chip);border-radius:10px;padding:12px;margin:6px 0 8px}
+.ac-novo label{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:.78rem}
+.ac-novo .row,.ac-novo .ac-err{grid-column:1/-1}
+@media (max-width:640px){.nv-resp{grid-template-columns:minmax(0,1fr)}.ac-u{grid-template-columns:minmax(0,1fr) auto}.ac-acoes{grid-column:1/-1;justify-content:flex-start}}
+.festa{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:9999;display:flex;align-items:center;gap:12px;background:var(--surface);color:var(--fg);border:2px solid var(--brand);border-radius:16px;padding:14px 16px;box-shadow:0 18px 50px rgba(0,0,0,.25);min-width:min(340px,calc(100vw - 32px));max-width:calc(100vw - 32px);animation:festaEntra .35s ease-out}
+.festa b{display:block;font-family:var(--f-display);font-size:1.15rem;color:var(--brand-strong)}
+.festa span{display:block;font-size:.86rem;color:var(--muted)}
+.festa-i{font-size:1.9rem;line-height:1}
+.festa button{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:1rem;padding:4px 6px}
+.festa.sai{opacity:0;transform:translate(-50%,-10px);transition:.25s}
+@keyframes festaEntra{from{opacity:0;transform:translate(-50%,-14px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.confete{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9998}
+@media (prefers-reduced-motion:reduce){.festa{animation:none}}
+</style>
 </head>
 <body>
 <section class="login" id="login" aria-label="Entrar no painel">
@@ -435,9 +471,7 @@ body.fin-aberto{overflow:hidden}
       <div class="lg-row"><label for="lLembrar"><input type="checkbox" id="lLembrar" checked> Manter conectado</label><button type="button" id="lEsq">Esqueci minha senha</button></div>
       <div id="lMsg" hidden></div>
       <button class="btn pri" type="submit" style="justify-content:center;padding:12px">Entrar</button>
-      <div class="lg-div">Acesso de demonstração</div>
-      <div class="lg-demo"><button type="button" data-demo="gestor@viverassessoriacomercial.com.br"><b>Entrar como gestor</b><small>vê as duas visões</small></button><button type="button" data-demo="rafael.mendes@rmcorretora.com.br"><b>Entrar como corretor</b><small>vê só a área do corretor</small></button></div>
-      <p class="lg-foot">Versão de demonstração: qualquer senha é aceita.<br>viverassessoriacomercial.com.br</p>
+      <p class="lg-foot">viverassessoriacomercial.com.br</p>
     </form>
   </div>
 </section>
@@ -456,7 +490,7 @@ body.fin-aberto{overflow:hidden}
     <div class="top">
       <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">☰ Menu</button>
       <div><h1 id="pgTitle">Visão geral</h1><p class="sub" id="pgSub"></p></div>
-      <div class="who"><span class="sample">Dados de exemplo</span><span class="nmx" id="whoName" style="font-weight:600"></span><div class="avatar" id="whoAv"></div><button class="logout" id="logout">Sair</button></div>
+      <div class="who"><span class="nmx" id="whoName" style="font-weight:600"></span><div class="avatar" id="whoAv"></div><button class="logout" id="logout">Sair</button></div>
     </div>
     <div id="view"></div>
     <div id="simWrap" hidden><iframe id="sim-frame" title="Simulador de preços" src="about:blank"></iframe></div>
@@ -542,35 +576,12 @@ const PACKS = [
 const DOCS7 = ["Contrato Social (cópia + última alteração)","Cartão CNPJ com CNAE 66.22-3-00","Comprovante bancário (só conta PJ)","Docs dos sócios: RG/CPF ou CNH + residência","Carta bancária assinada, conforme modelo","Fator tributário: PGDAS atualizado (Simples)","Termo de vínculo assinado"];
 const DOCS4 = ["Termo de vínculo assinado","Contrato social atualizado","Telefone do sócio","E-mail do sócio"];
 
-const C = [
-  {id:1,nome:"Rafael Mendes",corr:"RM Corretora de Seguros",desde:"02/09/2026",etapa:5,vidas:4,sem:[0,2,1,3,2,4],st:"ok"},
-  {id:2,nome:"Juliana Prado",corr:"Prado Benefícios",desde:"28/08/2026",etapa:8,vidas:9,sem:[2,3,4,3,5,6],st:"ok"},
-  {id:3,nome:"Marcos Tavares",corr:"Tavares Corretora",desde:"15/09/2026",etapa:3,vidas:0,sem:[0,0,0,0,0,0],st:"crit",motivo:"Sem venda há 20 dias e imersão pendente"},
-  {id:4,nome:"Camila Rocha",corr:"CR Saúde Corretora",desde:"10/09/2026",etapa:6,vidas:5,sem:[0,1,2,2,3,2],st:"ok"},
-  {id:5,nome:"André Nogueira",corr:"Nogueira & Filhos",desde:"21/09/2026",etapa:1,vidas:0,sem:[0,0,0,0,0,0],st:"warn",motivo:"Faltam PGDAS e carta bancária"},
-  {id:6,nome:"Patrícia Lemos",corr:"Lemos Seguros",desde:"05/09/2026",etapa:7,vidas:6,sem:[1,1,2,3,3,3],st:"warn",motivo:"2 propostas com pendência documental"},
-  {id:7,nome:"Thiago Barros",corr:"TB Corretora",desde:"30/08/2026",etapa:8,vidas:12,sem:[3,4,4,5,6,7],st:"ok"},
-  {id:8,nome:"Fernanda Lima",corr:"Lima Planos de Saúde",desde:"18/09/2026",etapa:4,vidas:1,sem:[0,0,0,1,0,1],st:"ok"},
-  {id:9,nome:"Bruno Carvalho",corr:"Carvalho Corretora",desde:"01/09/2026",etapa:7,vidas:3,sem:[1,2,1,0,1,0],st:"crit",motivo:"Cliente com boleto em atraso antes da 4ª parcela"},
-  {id:10,nome:"Larissa Duarte",corr:"Duarte Benefícios",desde:"25/09/2026",etapa:2,vidas:0,sem:[0,0,0,0,0,0],st:"ok"},
-  {id:11,nome:"Gustavo Pires",corr:"GP Seguros",desde:"12/09/2026",etapa:5,vidas:2,sem:[0,0,1,1,2,2],st:"warn",motivo:"Pediu kit de design há 4 dias"},
-  {id:12,nome:"Renata Souza",corr:"Souza Corretora",desde:"08/09/2026",etapa:6,vidas:4,sem:[0,1,1,2,2,3],st:"ok"},
-];
-const ME = 1; // corretor logado na visão Corretor
-let PED = [
-  {id:101,tipo:"treinamento",c:3,assunto:"Imersão inicial",data:"05/10",st:"aberto"},
-  {id:102,tipo:"treinamento",c:8,assunto:"Reciclagem de produto Hapvida",data:"04/10",st:"agendado"},
-  {id:103,tipo:"apoio",c:6,cat:"Digitação",assunto:"Proposta com documento ilegível",data:"05/10",st:"aberto"},
-  {id:104,tipo:"apoio",c:9,cat:"Pós-venda",assunto:"Cliente com boleto em atraso",data:"04/10",st:"em andamento"},
-  {id:105,tipo:"apoio",c:11,cat:"Marketing",assunto:"Kit de design com a minha logo",data:"01/10",st:"aberto"},
-  {id:106,tipo:"leads",c:7,pack:"diamante",assunto:"Pacote Diamante · 30 leads",valor:600,data:"03/10",st:"pago"},
-  {id:107,tipo:"leads",c:2,pack:"ouro",assunto:"Pacote Ouro · 20 leads",valor:300,data:"02/10",st:"entregue"},
-  {id:108,tipo:"treinamento",c:12,assunto:"Venda PME e multiproduto",data:"03/10",st:"concluído"},
-  {id:109,tipo:"apoio",c:4,cat:"Financeiro",assunto:"Conferir comissão de setembro",data:"02/10",st:"concluído"},
-];
+const C = [];
+let ME = -1; // corretora de quem está logado (vem do banco)
+let PED = [];
 let nextId = 200;
 const SEMANAS = ["01/set","08/set","15/set","22/set","29/set","05/out"];
-const FUNIL = [{t:"Abordagens",v:182,m:250},{t:"Reuniões realizadas",v:61,m:80},{t:"Corretores vinculados",v:C.length,m:40}];
+const FUNIL = [{t:"",v:0,m:1},{t:"",v:0,m:1},{t:"",v:0,m:1}];
 
 /* ================= ESTADO ================= */
 let role = "gestor", page = "visao", kitLogo = null, pendingPack = null, apoioCat = null;
@@ -722,18 +733,7 @@ function mkProc(o){
     cur+=x[1]*DIA; return seg; });
   o.etapa=[...o.hist].reverse().find(h=>!h.pend).etapa; delete o.segs; return o;
 }
-let EST = [
-  mkProc({id:1, corretora:"Nogueira & Filhos", cnpj:"41.283.556/0001-09", corretor:"André Nogueira", tipo:"novo", segs:[[0,6]]}),
-  mkProc({id:2, corretora:"Duarte Benefícios", cnpj:"38.904.112/0001-44", corretor:"Larissa Duarte", tipo:"existente", segs:[[0,2],[1,1]]}),
-  mkProc({id:3, corretora:"Alves Seguros e Saúde", cnpj:"29.551.870/0001-31", corretor:"Paulo Alves", tipo:"existente", segs:[[0,1],[1,0],[2,2]]}),
-  mkProc({id:4, corretora:"Lima Planos de Saúde", cnpj:"44.102.390/0001-77", corretor:"Fernanda Lima", tipo:"novo", segs:[[0,3],[1,1],[2,1],[3,9]]}),
-  mkProc({id:5, corretora:"Tavares Corretora", cnpj:"33.719.004/0001-60", corretor:"Marcos Tavares", tipo:"existente", segs:[[0,2],[1,1],[2,1],[3,1]]}),
-  mkProc({id:6, corretora:"Costa & Ribeiro Corretora", cnpj:"47.660.218/0001-02", corretor:"Bianca Costa", tipo:"novo", segs:[[0,4],[1,1],[2,1],[3,3],["p",4,"PGDAS vencido, Hapvida pediu o atualizado"]]}),
-  mkProc({id:7, corretora:"Mendonça Benefícios", cnpj:"36.228.941/0001-85", corretor:"Rodrigo Mendonça", tipo:"existente", segs:[[0,3],[1,1],["p",1,"Contrato social sem a última alteração"]]}),
-  mkProc({id:8, corretora:"Souza Corretora", cnpj:"31.405.667/0001-13", corretor:"Renata Souza", tipo:"existente", segs:[[0,1],[1,1],[2,0],[3,2],[4,6]]}),
-  mkProc({id:9, corretora:"Prado Benefícios", cnpj:"28.317.552/0001-90", corretor:"Juliana Prado", tipo:"novo", segs:[[0,3],[1,1],[2,1],[3,6],[4,12]]}),
-  mkProc({id:10, corretora:"Rocha Saúde Corretora", cnpj:"45.993.170/0001-28", corretor:"Igor Rocha", tipo:"novo", segs:[[0,2],[1,3]]}),
-];
+let EST = [];
 let estNext=11, estFiltro="todos", estSel=null, estNovo=false;
 const estAtual = p=>p.hist[p.hist.length-1];
 const estResp = p=>estAtual(p).resp;
@@ -838,11 +838,11 @@ function crDados(){
   if(!gestor){
     const me=byId(ME), meus=PED.filter(p=>p.c===ME);
     return "## Dados de quem pergunta (só deste corretor)\nCorretor: "+me.nome+" · Corretora: "+(me.corr||"")+"\nJornada: "+me.etapa+" de 8 etapas concluídas; próxima: "+(JORNADA[me.etapa]?JORNADA[me.etapa].t:"jornada completa")
-      +"\nVidas no mês: "+me.vidas+" (meta 5) · Comissão NF estimada: "+brl(me.vidas*900)+" · Vitalício: R$ 6 por vida ativa"
+      +"\nVidas no mês: "+me.vidas+" (meta 5) · Grade de comissão: "+(me.grade||"não informada")+" · Comissão NF estimada: "+brl(me.vidas*300*(me.gradePct||300)/100)+" · Vitalício: R$ 6 por vida ativa"
       +"\nPedidos: "+(meus.length?meus.map(p=>p.assunto+" ("+(p.tipo==="leads"?"leads":p.tipo==="treinamento"?"treinamento":p.cat)+", "+p.data+", "+p.st+")").join("; "):"nenhum");
   }
   const at = EST.filter(p=>estResp(p)!=="concluido").map(p=>{ const st=estStatus(p), a=estAtual(p); return "- "+p.corretora+" ("+FLUXOS[p.tipo].curto+"): com "+RESP[a.resp].t+" — "+a.t+" — há "+st.d+" dia(s), SLA "+st.sla+"d — "+st.t; });
-  return "## Dados da operação (visão do gestor; dados de exemplo do portal)\nCorretores vinculados ("+C.length+"):\n"+C.map(c=>"- "+c.nome+" · "+c.corr+" · jornada "+c.etapa+"/8 · "+c.vidas+" vidas no mês · "+({ok:"em dia",warn:"atenção",crit:"precisa de apoio"}[c.st])+(c.motivo?" ("+c.motivo+")":"")).join("\n")
+  return "## Dados da operação (visão do gestor; dados reais do portal)\nCorretores vinculados ("+C.length+"):\n"+C.map(c=>"- "+c.nome+" · "+c.corr+" · jornada "+c.etapa+"/8 · "+c.vidas+" vidas no mês · "+({ok:"em dia",warn:"atenção",crit:"precisa de apoio"}[c.st])+(c.motivo?" ("+c.motivo+")":"")).join("\n")
     +"\n\nPedidos em aberto:\n"+(PED.filter(p=>!["concluído","entregue"].includes(p.st)).map(p=>"- "+byId(p.c).nome+": "+p.assunto+" ("+p.tipo+", "+p.data+", "+p.st+")").join("\n")||"nenhum")
     +"\n\nEsteira de vínculos em andamento:\n"+(at.join("\n")||"nenhum processo");
 }
@@ -1001,9 +1001,9 @@ visao(){
   </div>
   <div class="grid two" style="margin-top:16px">
     <div class="card"><div class="card-h"><h2>Vidas vendidas por semana</h2><p>Soma dos corretores vinculados</p></div>${barChart(vidasSem,SEMANAS)}</div>
-    <div class="card"><div class="card-h"><h2>Funil de captação</h2><p>Outubro · cadência do plano</p></div>
+    <div class="card"><div class="card-h"><h2>Funil de captação</h2><p>Base real da esteira de vínculos</p></div>
       <div class="funnel">${FUNIL.map(f=>`<div class="fstep"><div class="fh"><span>${f.t}</span><span class="num"><b>${f.v}</b> / ${f.m}</span></div><div class="ft"><i style="width:${Math.min(100,f.v/f.m*100)}%"></i></div></div>`).join("")}</div>
-      <p class="note" style="margin-top:14px">Conversão reunião → vínculo: <b class="num">${Math.round(C.length/61*100)}%</b> · plano prevê 40–60%</p>
+      <p class="note" style="margin-top:14px">Vínculos concluídos: <b class="num">${FUNIL[0].v?Math.round(FUNIL[2].v/FUNIL[0].v*100):0}%</b> da base</p>
     </div>
   </div>
   <div class="grid two" style="margin-top:16px">
@@ -1114,7 +1114,7 @@ links(){
 inicio(){
   const me=byId(ME), pct=Math.round(me.etapa/8*100), r=40, circ=2*Math.PI*r;
   const meus=PED.filter(p=>p.c===ME);
-  const comissao=me.vidas*900;
+  const comissao=me.vidas*300*(me.gradePct||300)/100;
   return `
   <div class="hello">
     <div><p style="font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600">Bem-vindo à Viver</p><h1 style="margin-top:4px">Olá, ${me.nome.split(" ")[0]}! Você vende, a gente cuida do processo.</h1>
@@ -1124,8 +1124,8 @@ inicio(){
   </div>
   <div class="grid kpis" style="margin-top:16px">
     <div class="card kpi"><div class="k">Vidas no mês</div><div class="v num">${me.vidas}</div><div class="d">Meta: 5 vidas</div><div class="bar"><i style="width:${Math.min(100,me.vidas/5*100)}%"></i></div></div>
-    <div class="card kpi"><div class="k">Comissão NF estimada</div><div class="v num">${brl(comissao)}</div><div class="d">300% do ticket médio de R$ 300</div></div>
-    <div class="card kpi"><div class="k">Propostas em digitação</div><div class="v num">2</div><div class="d">A Viver acompanha até a vida ativa</div></div>
+    <div class="card kpi"><div class="k">Comissão NF estimada</div><div class="v num">${brl(comissao)}</div><div class="d">${me.gradePct||300}% do ticket médio de R$ 300${me.grade?" · grade "+me.grade:""}</div></div>
+    <div class="card kpi"><div class="k">Propostas em digitação</div><div class="v num">0</div><div class="d">A Viver acompanha até a vida ativa</div></div>
     <div class="card kpi"><div class="k">Vitalício acumulado</div><div class="v num">${brl(me.sem.reduce((a,b)=>a+b,0)*6)}<small style="font-size:.8rem;color:var(--muted)">/mês</small></div><div class="d">R$ 6 por vida ativa</div></div>
   </div>
   <div class="grid two" style="margin-top:16px">
@@ -1359,8 +1359,8 @@ function msg(t,err){const m=$("#lMsg");m.hidden=false;m.className="lg-msg"+(err?
 function entrar(email,lembrar){
   const perfil=perfilDe(email);
   USER={email,perfil,nome:nomeDe(email)};
-  byId(ME).nome=(perfil==="corretor"&&USER.nome!=="Corretor")?USER.nome:"Rafael Mendes";
-  byId(ME).corr=perfil==="corretor"?corretoraDe(email,USER.nome):"RM Corretora de Seguros";
+  
+  
   role=perfil; page=perfil==="gestor"?"visao":"inicio";
   try{(lembrar?localStorage:sessionStorage).setItem("viverUser",JSON.stringify({email}))}catch(e){}
   $("#login").hidden=true; $("#app").hidden=false; render();
@@ -1371,19 +1371,8 @@ document.querySelector(".lg-tabs").addEventListener("click",e=>{const b=e.target
   document.querySelectorAll(".lg-tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
   $("#lEmail").placeholder=loginTipo==="gestor"?"voce@viverassessoriacomercial.com.br":"voce@suacorretora.com.br";$("#lMsg").hidden=true});
 $("#pwT").onclick=()=>{const i=$("#lSenha");const v=i.type==="password";i.type=v?"text":"password";$("#pwT").textContent=v?"Ocultar":"Mostrar"};
-$("#lEsq").onclick=()=>msg("Na demonstração qualquer senha funciona. Na versão final, o link de redefinição chega no seu e-mail.");
-document.querySelectorAll("[data-demo]").forEach(b=>b.onclick=()=>{$("#lEmail").value=b.dataset.demo;$("#lSenha").value="demo1234";
-  loginTipo=perfilDe(b.dataset.demo);document.querySelectorAll(".lg-tabs button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.lt===loginTipo));entrar(b.dataset.demo,false)});
-$("#fLogin").addEventListener("submit",e=>{e.preventDefault();
-  const em=$("#lEmail").value.trim().toLowerCase(), pw=$("#lSenha").value;
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return msg("Digite um e-mail válido, como voce@suacorretora.com.br.",true);
-  if(!pw) return msg("Digite sua senha. Na demonstração qualquer senha funciona.",true);
-  entrar(em,$("#lLembrar").checked)});
-$("#logout").onclick=()=>{try{localStorage.removeItem("viverUser");sessionStorage.removeItem("viverUser")}catch(e){}
-  if(CR.ctl) CR.ctl.abort(); CR.conversa=[]; CR.carregou=""; USER=null;window.VIVER_GESTOR=false;fecharFinanceiro();$("#app").hidden=true;$("#login").hidden=false;$("#fab").hidden=true;closeSide();$("#lSenha").value="";$("#lMsg").hidden=true};
-(function(){let saved=null;try{saved=JSON.parse(localStorage.getItem("viverUser")||sessionStorage.getItem("viverUser")||"null")}catch(e){}
-  if(saved&&saved.email) entrar(saved.email,true);})();
 </script>
-
+<script src="supabase.js"></script>
+<script src="nuvem.js"></script>
 </body>
 </html>
