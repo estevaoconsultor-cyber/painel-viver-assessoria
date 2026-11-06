@@ -15,14 +15,16 @@ const sbStorage = {
 };
 const sb = window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true, autoRefreshToken:true, storage:sbStorage, storageKey:"viver-portal"}});
 
-const N = {perfil:null, uid:null, corretoras:[], usuarios:null, carregadoEm:0, canal:null, notifFila:[], acSel:null, acForm:null, acSenha:null, acExcluir:null, acBusca:"", acResult:null};
+const N = {H:{}, perfil:null, uid:null, corretoras:[], usuarios:null, carregadoEm:0, canal:null, notifFila:[], acSel:null, acForm:null, acSenha:null, acExcluir:null, acBusca:"", acResult:null};
 const papel = ()=>N.perfil?N.perfil.papel:"";
 const ehGestorViver = ()=>papel()==="gestor";
 const ehHapvida = ()=>papel()==="hapvida";
 const ehEquipe = ()=>ehGestorViver()||ehHapvida();
 const esc = t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const dataMs = s=>{ if(!s) return null; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); if(!m) return null; return new Date(+m[1],+m[2]-1,+m[3]).getTime(); };
-const diaMs = iso=>{ const d=new Date(iso); d.setHours(0,0,0,0); return d.getTime(); };
+const soDia = iso=>/^\d{4}-\d{2}-\d{2}([T ]00:00:00(\.0+)?(Z|\+00(:?00)?))?$/.test(String(iso||""));   // registro da planilha: só o dia, sem hora
+const diaMs = iso=>{ if(soDia(iso)) return dataMs(iso); const d=new Date(iso); d.setHours(0,0,0,0); return d.getTime(); };
+const quandoFmt = iso=>{ if(soDia(iso)) return fmtData(iso).slice(0,5); const d=new Date(iso); return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); };
 const fmtData = s=>{ const t=dataMs(s); if(t==null) return "—"; const d=new Date(t); return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear(); };
 const isoHoje = ()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
 const soDig = s=>String(s||"").replace(/\D/g,"");
@@ -89,7 +91,7 @@ function montarHist(c, hs){
 async function carregar(){
   const [rc, rh, rcf, rp] = await Promise.all([
     sb.from("corretoras").select("*").order("nome"),
-    sb.from("corretora_historico").select("corretora_id,com_quem,situacao,etapa,pend,pendencia,prazo,em").order("em").order("id"),
+    sb.from("corretora_historico").select("id,corretora_id,com_quem,situacao,etapa,pend,pendencia,prazo,em,por").order("em").order("id"),
     sb.from("config").select("chave,valor"),
     (ehHapvida() ? Promise.resolve({data:[]}) : sb.from("pedidos").select("*").order("id")),
   ]);
@@ -97,7 +99,7 @@ async function carregar(){
   if(erro) throw new Error(erro.message);
   N.corretoras = rc.data||[]; N.carregadoEm = Date.now();
   const sla = (rcf.data||[]).find(x=>x.chave==="sla"); if(sla) aplicarSla(sla.valor);
-  const H = {}; (rh.data||[]).forEach(h=>{ (H[h.corretora_id]=H[h.corretora_id]||[]).push(h); });
+  const H = {}; (rh.data||[]).forEach(h=>{ (H[h.corretora_id]=H[h.corretora_id]||[]).push(h); }); N.H = H;
   const ativas = N.corretoras.filter(c=>c.com_quem!=="declinado");
   // ESTEIRA
   EST = ativas.map(c=>{
@@ -195,6 +197,24 @@ const linhaResp = (i,r={})=>`<div class="nv-resp" data-ri="${i}">
   <label>E-mail<input data-rf="email" type="email" value="${esc(r.email||"")}" placeholder="nome@corretora.com.br"></label>
   <button class="btn sm" type="button" data-rmresp="${i}" title="Remover responsável" aria-label="Remover responsável">✕</button></div>`;
 
+function ultimasAtualizacoes(id){
+  const itens=[]; let ant=null;
+  (N.H[id]||[]).forEach(h=>{
+    const hap = h.com_quem==="hapvida", pend = !!(h.pendencia||h.pend);
+    const chave = [h.com_quem,h.situacao||"",h.pendencia||"",h.prazo||""].join("|");
+    if((hap||pend) && chave!==ant) itens.push({em:h.em, tipo:pend?"pend":"hap", texto: pend?(h.pendencia||"Pendência com o corretor"):(h.situacao||"Em análise na Hapvida"), extra: pend&&hap&&h.situacao?h.situacao:"", prazo:h.prazo, por:h.por});
+    ant = chave;
+  });
+  return itens.reverse();
+}
+function blocoAtualizacoes(p){
+  const its = ultimasAtualizacoes(p.id);
+  return `<div class="vc-upd" aria-live="polite"><div class="vc-upd-h">Últimas atualizações<small>Hapvida e pendências</small></div>
+    ${its.length?`<ol>${its.slice(0,6).map(i=>`<li class="${i.tipo}"><div class="vc-upd-l"><span class="vc-upd-tag">${i.tipo==="pend"?"Pendência":"Hapvida"}</span><span class="vc-upd-q num">${quandoFmt(i.em)}</span></div>
+      <p>${esc(i.texto)}${i.extra?`<br><small>${esc(i.extra)}</small>`:""}</p>${i.prazo?`<small class="num">Prazo de análise: ${fmtData(i.prazo)}</small>`:""}${i.por&&!/planilha/i.test(i.por)?`<small>por ${esc(String(i.por).replace("@"+DOMINIO_LOGIN,""))}</small>`:""}</li>`).join("")}</ol>${its.length>6?`<small class="vc-upd-mais">+${its.length-6} anteriores na ficha</small>`:""}`
+      :`<p class="vc-upd-vazio">Nenhuma movimentação da Hapvida ou pendência registrada ainda.</p>`}
+    <button type="button" class="btn sm" data-ficha="${p.id}">Abrir ficha e editar</button></div>`;
+}
 VIEWS.esteira = function(){
   const lista = EST.filter(p=>estFiltro==="todos"||p.tipo===estFiltro);
   const ativos = lista.filter(p=>estResp(p)!=="concluido");
@@ -215,7 +235,7 @@ VIEWS.esteira = function(){
     </button>`; };
   const ordem = (x,y)=>{ const sx=estStatus(x), sy=estStatus(y); return (sy.d-sy.sla)-(sx.d-sx.sla); };
   const col = (r,titulo)=>{ const ps=lista.filter(p=>estResp(p)===r).sort(r==="concluido"?(x,y)=>estAtual(y).ini-estAtual(x).ini:ordem);
-    return `<div class="col"><div class="col-h" style="--rc:${RESP[r].c}"><b>${titulo}</b><span class="num">${ps.length}</span></div>${ps.map(card).join("")||`<div class="col-empty">Nada aqui agora.</div>`}</div>`; };
+    return `<div class="col"><div class="col-h" style="--rc:${RESP[r].c}"><b>${titulo}</b><span class="num">${ps.length}</span></div>${ps.length?`<div class="col-cards">${ps.map(p=>card(p)+(estSel===p.id?blocoAtualizacoes(p):"")).join("")}</div>${ps.length>5?`<div class="col-mais">Role para ver os outros ${ps.length-5} ↓</div>`:""}`:`<div class="col-empty">Nada aqui agora.</div>`}</div>`; };
   const podeSla = ehGestorViver();
   return `
   <div class="grid kpis">
@@ -282,7 +302,19 @@ AFTER.esteira = function(){
       estNovo=false; estSel=data.id; await recarregar(`${razao} entrou na esteira: aguardando documentos do corretor`);
     });
   }
-  $(".board").addEventListener("click",e=>{const c=e.target.closest("[data-proc]");if(!c)return;estEdit=false;estSel=+c.dataset.proc===estSel?null:+c.dataset.proc;render();if(estSel)$("#estDet").scrollIntoView({behavior:"smooth",block:"start"})});
+  $(".board").addEventListener("click",e=>{
+    const f=e.target.closest("[data-ficha]"); if(f){ $("#estDet").scrollIntoView({behavior:"smooth",block:"start"}); return; }
+    const c=e.target.closest("[data-proc]");if(!c)return;estEdit=false;estSel=+c.dataset.proc===estSel?null:+c.dataset.proc;render();
+    if(estSel){ const sel=document.querySelector(`.vcard[data-proc="${estSel}"]`), cx=sel&&sel.closest(".col-cards"); if(cx){ cx.scrollTop=Math.max(0,sel.offsetTop-4); } }
+  });
+  // cada coluna mostra no máximo 5 corretores; os demais aparecem rolando a coluna
+  document.querySelectorAll(".col-cards").forEach(cx=>{
+    const cards=[...cx.querySelectorAll(":scope > .vcard")];
+    if(cards.length<=5){ cx.style.maxHeight=""; return; }
+    const quinto=cards[4], extra=quinto.nextElementSibling&&quinto.nextElementSibling.classList.contains("vc-upd")?quinto.nextElementSibling:null;
+    const fim=(extra||quinto).offsetTop+(extra||quinto).offsetHeight;   // .col-cards é a referência (position:relative)
+    cx.style.maxHeight=(fim+2)+"px"; cx.classList.add("rola");
+  });
   document.querySelectorAll("[data-sla]").forEach(inp=>inp.addEventListener("change",async()=>{
     if(!ehGestorViver()) return;
     const v=Math.max(0,Math.min(60,parseInt(inp.value,10)||0));

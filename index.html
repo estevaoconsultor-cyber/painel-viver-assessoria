@@ -446,6 +446,24 @@ body.fin-aberto{overflow:hidden}
 .festa button{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:1rem;padding:4px 6px}
 .festa.sai{opacity:0;transform:translate(-50%,-10px);transition:.25s}
 @keyframes festaEntra{from{opacity:0;transform:translate(-50%,-14px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.col-cards{display:flex;flex-direction:column;gap:8px;position:relative;min-width:0}
+.col-cards.rola{overflow-y:auto;overscroll-behavior:contain;padding-right:4px;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--brand) 40%,transparent) transparent}
+.col-mais{font-size:.72rem;color:var(--muted);text-align:center;padding:2px 0 0}
+.vc-upd{background:color-mix(in srgb,var(--brand) 6%,var(--surface));border:1px solid color-mix(in srgb,var(--brand) 35%,var(--line));border-radius:10px;padding:10px 11px;display:flex;flex-direction:column;gap:8px;margin-top:-2px}
+.vc-upd-h{font-weight:700;font-size:.8rem;display:flex;justify-content:space-between;align-items:baseline;gap:6px;flex-wrap:wrap}
+.vc-upd-h small{font-weight:500;color:var(--muted);font-size:.7rem}
+.vc-upd ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.vc-upd li{overflow-wrap:anywhere;border-left:3px solid var(--navy);padding:2px 0 2px 9px;display:flex;flex-direction:column;gap:2px;font-size:.76rem}
+.vc-upd li.pend{border-left-color:var(--gold)}
+.vc-upd li p{margin:0;line-height:1.35}
+.vc-upd li small{color:var(--muted);font-size:.7rem}
+.vc-upd-l{display:flex;justify-content:space-between;gap:6px;align-items:baseline}
+.vc-upd-tag{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--navy)}
+.vc-upd li.pend .vc-upd-tag{color:var(--gold)}
+.vc-upd-q{font-size:.68rem;color:var(--muted)}
+.vc-upd-vazio{margin:0;font-size:.76rem;color:var(--muted)}
+.vc-upd-mais{font-size:.7rem;color:var(--muted)}
+.vc-upd .btn{align-self:flex-start}
 .confete{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9998}
 @media (prefers-reduced-motion:reduce){.festa{animation:none}}
 </style>
